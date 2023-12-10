@@ -1,5 +1,5 @@
 <?php
-require_once './db_connection.php';
+require_once '../db_connection.php';
 
 // lấy productId
 if (isset($_GET['TenCSVC'])) {
