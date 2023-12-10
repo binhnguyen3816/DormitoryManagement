@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Máy chủ: localhost:3307
--- Thời gian đã tạo: Th12 10, 2023 lúc 02:52 AM
--- Phiên bản máy phục vụ: 10.4.28-MariaDB
--- Phiên bản PHP: 8.2.4
+-- Host: 127.0.0.1:3307
+-- Generation Time: Dec 10, 2023 at 10:24 AM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Cơ sở dữ liệu: `asm2`
+-- Database: `asm2`
 --
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `admin`
+-- Table structure for table `admin`
 --
 
 CREATE TABLE `admin` (
@@ -35,7 +35,7 @@ CREATE TABLE `admin` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `admin`
+-- Dumping data for table `admin`
 --
 
 INSERT INTO `admin` (`id`, `username`, `password`, `updateAt`) VALUES
@@ -44,7 +44,7 @@ INSERT INTO `admin` (`id`, `username`, `password`, `updateAt`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `baove`
+-- Table structure for table `baove`
 --
 
 CREATE TABLE `baove` (
@@ -53,7 +53,7 @@ CREATE TABLE `baove` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `baove`
+-- Dumping data for table `baove`
 --
 
 INSERT INTO `baove` (`MaNV`, `TenCN`) VALUES
@@ -71,7 +71,7 @@ INSERT INTO `baove` (`MaNV`, `TenCN`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `cosovatchat`
+-- Table structure for table `cosovatchat`
 --
 
 CREATE TABLE `cosovatchat` (
@@ -81,29 +81,29 @@ CREATE TABLE `cosovatchat` (
   `GioDongCua` time NOT NULL,
   `TenCN` varchar(20) NOT NULL,
   `TinhTrang` varchar(50) NOT NULL,
-  `MaNV` varchar(10) NOT NULL
+  `MaNVQL` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `cosovatchat`
+-- Dumping data for table `cosovatchat`
 --
 
-INSERT INTO `cosovatchat` (`TenCSVC`, `GiaThue`, `GioMoCua`, `GioDongCua`, `TenCN`, `TinhTrang`, `MaNV`) VALUES
-('Internet', 10000, '06:00:00', '20:00:00', 'AH', '', 'TCN0013'),
-('Phòng giặt', 10000, '06:00:00', '20:00:00', 'C', '', 'TCN0016'),
-('Phòng sấy', 5000, '06:00:00', '20:00:00', 'F', '', 'TCN0019'),
-('Phòng tập aerobic', 10000, '06:00:00', '20:00:00', 'E', '', 'TCN0018'),
-('Phòng tập gym', 6000, '06:00:00', '20:00:00', 'AG', '', 'TCN0012'),
-('Phòng tập yoga', 5000, '06:00:00', '20:00:00', 'B', '', 'TCN0015'),
-('Sân bóng chuyền', 10000, '06:00:00', '20:00:00', 'AB', '', 'TCN0014'),
-('Sân bóng rổ', 7000, '06:00:00', '20:00:00', 'D', '', 'TCN0017'),
-('Sân bóng đá', 5000, '06:00:00', '20:00:00', 'A', '', 'TCN0011'),
-('Sân cầu lông', 5000, '06:00:00', '20:00:00', 'G', '', 'TCN0020');
+INSERT INTO `cosovatchat` (`TenCSVC`, `GiaThue`, `GioMoCua`, `GioDongCua`, `TenCN`, `TinhTrang`, `MaNVQL`) VALUES
+('Internet', 10000, '06:00:00', '20:00:00', 'AH', 'đang hoạt động', 'TCN0013'),
+('Phòng giặt', 10000, '06:00:00', '20:00:00', 'C', 'đang hoạt động', 'TCN0016'),
+('Phòng sấy', 5000, '06:00:00', '20:00:00', 'F', 'đang hoạt động', 'TCN0019'),
+('Phòng tập aerobic', 10000, '06:00:00', '20:00:00', 'E', 'đang hoạt động', 'TCN0018'),
+('Phòng tập gym', 6000, '06:00:00', '20:00:00', 'AG', 'đang hoạt động', 'TCN0012'),
+('Phòng tập yoga', 5000, '06:00:00', '20:00:00', 'B', 'đang hoạt động', 'TCN0015'),
+('Sân bóng chuyền', 10000, '06:00:00', '20:00:00', 'AB', 'đang hoạt động', 'TCN0014'),
+('Sân bóng rổ', 7000, '06:00:00', '20:00:00', 'D', 'đang hoạt động', 'TCN0017'),
+('Sân bóng đá', 5000, '06:00:00', '20:00:00', 'A', 'đang hoạt động', 'TCN0011'),
+('Sân cầu lông', 5000, '06:00:00', '20:00:00', 'G', 'đang hoạt động', 'TCN0020');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `cumnha`
+-- Table structure for table `cumnha`
 --
 
 CREATE TABLE `cumnha` (
@@ -114,7 +114,7 @@ CREATE TABLE `cumnha` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `cumnha`
+-- Dumping data for table `cumnha`
 --
 
 INSERT INTO `cumnha` (`TenCN`, `SoToa`, `SucChua`, `SoLuongCSVC`) VALUES
@@ -132,7 +132,7 @@ INSERT INTO `cumnha` (`TenCN`, `SoToa`, `SucChua`, `SoLuongCSVC`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `hoadon`
+-- Table structure for table `hoadon`
 --
 
 CREATE TABLE `hoadon` (
@@ -148,7 +148,7 @@ CREATE TABLE `hoadon` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `hoadon`
+-- Dumping data for table `hoadon`
 --
 
 INSERT INTO `hoadon` (`MaHD`, `NgayTaoHoaDon`, `LoaiDV`, `NgayDangKy`, `NgayBatDauSD`, `NgayNgungSD`, `HanThanhToan`, `TrangThaiThanhToan`, `ThanhTien`) VALUES
@@ -206,7 +206,7 @@ INSERT INTO `hoadon` (`MaHD`, `NgayTaoHoaDon`, `LoaiDV`, `NgayDangKy`, `NgayBatD
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `hoadoncsvc`
+-- Table structure for table `hoadoncsvc`
 --
 
 CREATE TABLE `hoadoncsvc` (
@@ -217,7 +217,7 @@ CREATE TABLE `hoadoncsvc` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `hoadoncsvc`
+-- Dumping data for table `hoadoncsvc`
 --
 
 INSERT INTO `hoadoncsvc` (`MaHD`, `TenCSVC`, `SoGioThue`, `MaPDK`) VALUES
@@ -235,7 +235,7 @@ INSERT INTO `hoadoncsvc` (`MaHD`, `TenCSVC`, `SoGioThue`, `MaPDK`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `hoadondiennuoc`
+-- Table structure for table `hoadondiennuoc`
 --
 
 CREATE TABLE `hoadondiennuoc` (
@@ -252,7 +252,7 @@ CREATE TABLE `hoadondiennuoc` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `hoadondiennuoc`
+-- Dumping data for table `hoadondiennuoc`
 --
 
 INSERT INTO `hoadondiennuoc` (`MaHD`, `ChiSoDienDau`, `ChiSoDienCuoi`, `Gia1ChiSoDien`, `ChiSoNuocDau`, `ChiSoNuocCuoi`, `Gia1ChiSoNuoc`, `NgayChotChi`, `TenTaiKhoan`, `ThangThanhToan`) VALUES
@@ -270,7 +270,7 @@ INSERT INTO `hoadondiennuoc` (`MaHD`, `ChiSoDienDau`, `ChiSoDienCuoi`, `Gia1ChiS
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `hoadonluutru`
+-- Table structure for table `hoadonluutru`
 --
 
 CREATE TABLE `hoadonluutru` (
@@ -281,7 +281,7 @@ CREATE TABLE `hoadonluutru` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `hoadonluutru`
+-- Dumping data for table `hoadonluutru`
 --
 
 INSERT INTO `hoadonluutru` (`MaHD`, `LoaiPhong`, `GiaLuuTru1Thang`, `MaPDK`) VALUES
@@ -299,7 +299,7 @@ INSERT INTO `hoadonluutru` (`MaHD`, `LoaiPhong`, `GiaLuuTru1Thang`, `MaPDK`) VAL
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `hoadonnoithat`
+-- Table structure for table `hoadonnoithat`
 --
 
 CREATE TABLE `hoadonnoithat` (
@@ -310,7 +310,7 @@ CREATE TABLE `hoadonnoithat` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `hoadonnoithat`
+-- Dumping data for table `hoadonnoithat`
 --
 
 INSERT INTO `hoadonnoithat` (`MaHD`, `GiaThueTheoThang`, `MaPDK`, `NamThanhToan`) VALUES
@@ -328,7 +328,7 @@ INSERT INTO `hoadonnoithat` (`MaHD`, `GiaThueTheoThang`, `MaPDK`, `NamThanhToan`
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `hoadonthuembdv`
+-- Table structure for table `hoadonthuembdv`
 --
 
 CREATE TABLE `hoadonthuembdv` (
@@ -340,7 +340,7 @@ CREATE TABLE `hoadonthuembdv` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `hoadonthuembdv`
+-- Dumping data for table `hoadonthuembdv`
 --
 
 INSERT INTO `hoadonthuembdv` (`MaHD`, `MaMB`, `DienTich`, `ViTri`, `MaHopDong`) VALUES
@@ -358,7 +358,7 @@ INSERT INTO `hoadonthuembdv` (`MaHD`, `MaMB`, `DienTich`, `ViTri`, `MaHopDong`) 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `hopdong`
+-- Table structure for table `hopdong`
 --
 
 CREATE TABLE `hopdong` (
@@ -370,7 +370,7 @@ CREATE TABLE `hopdong` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `hopdong`
+-- Dumping data for table `hopdong`
 --
 
 INSERT INTO `hopdong` (`MaHopDong`, `MaMB`, `NgayBatDau`, `NgayKetThuc`, `CCCD`) VALUES
@@ -388,7 +388,7 @@ INSERT INTO `hopdong` (`MaHopDong`, `MaMB`, `NgayBatDau`, `NgayKetThuc`, `CCCD`)
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `kythuat`
+-- Table structure for table `kythuat`
 --
 
 CREATE TABLE `kythuat` (
@@ -398,7 +398,7 @@ CREATE TABLE `kythuat` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `kythuat`
+-- Dumping data for table `kythuat`
 --
 
 INSERT INTO `kythuat` (`MaNV`, `LoaiKyThuat`, `TenCN`) VALUES
@@ -416,7 +416,7 @@ INSERT INTO `kythuat` (`MaNV`, `LoaiKyThuat`, `TenCN`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `matbangdichvu`
+-- Table structure for table `matbangdichvu`
 --
 
 CREATE TABLE `matbangdichvu` (
@@ -430,7 +430,7 @@ CREATE TABLE `matbangdichvu` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `matbangdichvu`
+-- Dumping data for table `matbangdichvu`
 --
 
 INSERT INTO `matbangdichvu` (`MaMB`, `LoaiDichVu`, `ViTri`, `DienTich`, `TenCN`, `MaNV`, `GiaThue1Thang`) VALUES
@@ -448,7 +448,7 @@ INSERT INTO `matbangdichvu` (`MaMB`, `LoaiDichVu`, `ViTri`, `DienTich`, `TenCN`,
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `nguoithan`
+-- Table structure for table `nguoithan`
 --
 
 CREATE TABLE `nguoithan` (
@@ -459,7 +459,7 @@ CREATE TABLE `nguoithan` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `nguoithan`
+-- Dumping data for table `nguoithan`
 --
 
 INSERT INTO `nguoithan` (`SV_CCCD`, `HoVaTen`, `NgaySinh`, `GioiTinh`) VALUES
@@ -496,7 +496,7 @@ INSERT INTO `nguoithan` (`SV_CCCD`, `HoVaTen`, `NgaySinh`, `GioiTinh`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `nguoithuematbang`
+-- Table structure for table `nguoithuematbang`
 --
 
 CREATE TABLE `nguoithuematbang` (
@@ -506,7 +506,7 @@ CREATE TABLE `nguoithuematbang` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `nguoithuematbang`
+-- Dumping data for table `nguoithuematbang`
 --
 
 INSERT INTO `nguoithuematbang` (`CCCD`, `HoVaTen`, `SoDienThoai`) VALUES
@@ -524,7 +524,7 @@ INSERT INTO `nguoithuematbang` (`CCCD`, `HoVaTen`, `SoDienThoai`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `nhanvien`
+-- Table structure for table `nhanvien`
 --
 
 CREATE TABLE `nhanvien` (
@@ -537,7 +537,7 @@ CREATE TABLE `nhanvien` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `nhanvien`
+-- Dumping data for table `nhanvien`
 --
 
 INSERT INTO `nhanvien` (`MaNV`, `TienLuong`, `CCCD`, `HoVaTen`, `NgaySinh`, `GioiTinh`) VALUES
@@ -605,7 +605,7 @@ INSERT INTO `nhanvien` (`MaNV`, `TienLuong`, `CCCD`, `HoVaTen`, `NgaySinh`, `Gio
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `phieudangky`
+-- Table structure for table `phieudangky`
 --
 
 CREATE TABLE `phieudangky` (
@@ -617,11 +617,11 @@ CREATE TABLE `phieudangky` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `phieudangky`
+-- Dumping data for table `phieudangky`
 --
 
 INSERT INTO `phieudangky` (`MaPDK`, `NgayDangKy`, `ThoiGianBatDau`, `ThoiGianKetThuc`, `TenTaiKhoan`) VALUES
-('LT001', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user11'),
+('LT001', '0000-00-00', '2023-12-13 15:53:26', '0000-00-00 00:00:00', 'user11'),
 ('LT002', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user12'),
 ('LT003', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user13'),
 ('LT004', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user14'),
@@ -655,7 +655,7 @@ INSERT INTO `phieudangky` (`MaPDK`, `NgayDangKy`, `ThoiGianBatDau`, `ThoiGianKet
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `phieudangkycsvc`
+-- Table structure for table `phieudangkycsvc`
 --
 
 CREATE TABLE `phieudangkycsvc` (
@@ -664,7 +664,7 @@ CREATE TABLE `phieudangkycsvc` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `phieudangkycsvc`
+-- Dumping data for table `phieudangkycsvc`
 --
 
 INSERT INTO `phieudangkycsvc` (`MaPDK`, `TenCSVC`) VALUES
@@ -682,7 +682,7 @@ INSERT INTO `phieudangkycsvc` (`MaPDK`, `TenCSVC`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `phieudangkyluutru`
+-- Table structure for table `phieudangkyluutru`
 --
 
 CREATE TABLE `phieudangkyluutru` (
@@ -693,7 +693,7 @@ CREATE TABLE `phieudangkyluutru` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `phieudangkyluutru`
+-- Dumping data for table `phieudangkyluutru`
 --
 
 INSERT INTO `phieudangkyluutru` (`MaPDK`, `LoaiPhong`, `TenTN`, `SoPhong`) VALUES
@@ -711,7 +711,7 @@ INSERT INTO `phieudangkyluutru` (`MaPDK`, `LoaiPhong`, `TenTN`, `SoPhong`) VALUE
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `phieudangkynoithat`
+-- Table structure for table `phieudangkynoithat`
 --
 
 CREATE TABLE `phieudangkynoithat` (
@@ -720,7 +720,7 @@ CREATE TABLE `phieudangkynoithat` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `phieudangkynoithat`
+-- Dumping data for table `phieudangkynoithat`
 --
 
 INSERT INTO `phieudangkynoithat` (`MaPDK`, `LoaiPhong`) VALUES
@@ -738,7 +738,7 @@ INSERT INTO `phieudangkynoithat` (`MaPDK`, `LoaiPhong`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `phong`
+-- Table structure for table `phong`
 --
 
 CREATE TABLE `phong` (
@@ -750,7 +750,7 @@ CREATE TABLE `phong` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `phong`
+-- Dumping data for table `phong`
 --
 
 INSERT INTO `phong` (`TenTN`, `SoPhong`, `LoaiPhong`, `SucChua`, `GiaThue1Thang`) VALUES
@@ -767,7 +767,7 @@ INSERT INTO `phong` (`TenTN`, `SoPhong`, `LoaiPhong`, `SucChua`, `GiaThue1Thang`
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `sinhvien`
+-- Table structure for table `sinhvien`
 --
 
 CREATE TABLE `sinhvien` (
@@ -787,7 +787,7 @@ CREATE TABLE `sinhvien` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `sinhvien`
+-- Dumping data for table `sinhvien`
 --
 
 INSERT INTO `sinhvien` (`CCCD`, `MSSV`, `HoVaTen`, `NgaySinh`, `GioiTinh`, `Truong`, `Khoa`, `SinhVienNam`, `MaBHYT`, `HoKhau`, `TenTN`, `SoPhong`, `TP_CCCD`) VALUES
@@ -824,7 +824,7 @@ INSERT INTO `sinhvien` (`CCCD`, `MSSV`, `HoVaTen`, `NgaySinh`, `GioiTinh`, `Truo
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `sodienthoainv`
+-- Table structure for table `sodienthoainv`
 --
 
 CREATE TABLE `sodienthoainv` (
@@ -833,7 +833,7 @@ CREATE TABLE `sodienthoainv` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `sodienthoainv`
+-- Dumping data for table `sodienthoainv`
 --
 
 INSERT INTO `sodienthoainv` (`MaNV`, `SoDienThoai`) VALUES
@@ -901,7 +901,7 @@ INSERT INTO `sodienthoainv` (`MaNV`, `SoDienThoai`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `sodienthoaisv`
+-- Table structure for table `sodienthoaisv`
 --
 
 CREATE TABLE `sodienthoaisv` (
@@ -910,7 +910,7 @@ CREATE TABLE `sodienthoaisv` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `sodienthoaisv`
+-- Dumping data for table `sodienthoaisv`
 --
 
 INSERT INTO `sodienthoaisv` (`CCCD`, `SoDienThoai`) VALUES
@@ -947,7 +947,7 @@ INSERT INTO `sodienthoaisv` (`CCCD`, `SoDienThoai`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `taikhoannv`
+-- Table structure for table `taikhoannv`
 --
 
 CREATE TABLE `taikhoannv` (
@@ -957,7 +957,7 @@ CREATE TABLE `taikhoannv` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `taikhoannv`
+-- Dumping data for table `taikhoannv`
 --
 
 INSERT INTO `taikhoannv` (`TenTaiKhoan`, `MatKhau`, `MaNV`) VALUES
@@ -1025,7 +1025,7 @@ INSERT INTO `taikhoannv` (`TenTaiKhoan`, `MatKhau`, `MaNV`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `taikhoansv`
+-- Table structure for table `taikhoansv`
 --
 
 CREATE TABLE `taikhoansv` (
@@ -1035,7 +1035,7 @@ CREATE TABLE `taikhoansv` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `taikhoansv`
+-- Dumping data for table `taikhoansv`
 --
 
 INSERT INTO `taikhoansv` (`TenTaiKhoan`, `MatKhau`, `CCCD`) VALUES
@@ -1072,7 +1072,7 @@ INSERT INTO `taikhoansv` (`TenTaiKhoan`, `MatKhau`, `CCCD`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `tapvu`
+-- Table structure for table `tapvu`
 --
 
 CREATE TABLE `tapvu` (
@@ -1081,7 +1081,7 @@ CREATE TABLE `tapvu` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `tapvu`
+-- Dumping data for table `tapvu`
 --
 
 INSERT INTO `tapvu` (`MaNV`, `TenTN`) VALUES
@@ -1099,7 +1099,7 @@ INSERT INTO `tapvu` (`MaNV`, `TenTN`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `toanha`
+-- Table structure for table `toanha`
 --
 
 CREATE TABLE `toanha` (
@@ -1112,7 +1112,7 @@ CREATE TABLE `toanha` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `toanha`
+-- Dumping data for table `toanha`
 --
 
 INSERT INTO `toanha` (`TenTN`, `SoPhong`, `SucChua`, `SoTang`, `LoaiTN`, `TenCN`) VALUES
@@ -1129,7 +1129,7 @@ INSERT INTO `toanha` (`TenTN`, `SoPhong`, `SucChua`, `SoTang`, `LoaiTN`, `TenCN`
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `truongcumnha`
+-- Table structure for table `truongcumnha`
 --
 
 CREATE TABLE `truongcumnha` (
@@ -1140,7 +1140,7 @@ CREATE TABLE `truongcumnha` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `truongcumnha`
+-- Dumping data for table `truongcumnha`
 --
 
 INSERT INTO `truongcumnha` (`MaNV`, `Email`, `NgayBatDauQuanLy`, `TenCN`) VALUES
@@ -1158,7 +1158,7 @@ INSERT INTO `truongcumnha` (`MaNV`, `Email`, `NgayBatDauQuanLy`, `TenCN`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `truongtoanha`
+-- Table structure for table `truongtoanha`
 --
 
 CREATE TABLE `truongtoanha` (
@@ -1169,7 +1169,7 @@ CREATE TABLE `truongtoanha` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `truongtoanha`
+-- Dumping data for table `truongtoanha`
 --
 
 INSERT INTO `truongtoanha` (`MaNV`, `Email`, `TenTN`, `NgayBatDauQuanLy`) VALUES
@@ -1185,44 +1185,44 @@ INSERT INTO `truongtoanha` (`MaNV`, `Email`, `TenTN`, `NgayBatDauQuanLy`) VALUES
 ('TTN0030', 'hongnhung321@gmail.com', 'AG3', '2019-07-25');
 
 --
--- Chỉ mục cho các bảng đã đổ
+-- Indexes for dumped tables
 --
 
 --
--- Chỉ mục cho bảng `admin`
+-- Indexes for table `admin`
 --
 ALTER TABLE `admin`
   ADD PRIMARY KEY (`id`);
 
 --
--- Chỉ mục cho bảng `baove`
+-- Indexes for table `baove`
 --
 ALTER TABLE `baove`
   ADD PRIMARY KEY (`MaNV`),
   ADD KEY `FK_TenCNBV` (`TenCN`);
 
 --
--- Chỉ mục cho bảng `cosovatchat`
+-- Indexes for table `cosovatchat`
 --
 ALTER TABLE `cosovatchat`
   ADD PRIMARY KEY (`TenCSVC`),
   ADD KEY `FK_TenCNCSVC` (`TenCN`),
-  ADD KEY `FK_MaNVCSVC` (`MaNV`);
+  ADD KEY `FK_MaNVCSVC` (`MaNVQL`);
 
 --
--- Chỉ mục cho bảng `cumnha`
+-- Indexes for table `cumnha`
 --
 ALTER TABLE `cumnha`
   ADD PRIMARY KEY (`TenCN`);
 
 --
--- Chỉ mục cho bảng `hoadon`
+-- Indexes for table `hoadon`
 --
 ALTER TABLE `hoadon`
   ADD PRIMARY KEY (`MaHD`);
 
 --
--- Chỉ mục cho bảng `hoadoncsvc`
+-- Indexes for table `hoadoncsvc`
 --
 ALTER TABLE `hoadoncsvc`
   ADD PRIMARY KEY (`MaHD`),
@@ -1230,35 +1230,35 @@ ALTER TABLE `hoadoncsvc`
   ADD KEY `FK_TenCSVCHD` (`TenCSVC`);
 
 --
--- Chỉ mục cho bảng `hoadondiennuoc`
+-- Indexes for table `hoadondiennuoc`
 --
 ALTER TABLE `hoadondiennuoc`
   ADD PRIMARY KEY (`MaHD`),
   ADD KEY `FK_TenTaiKhoanDN` (`TenTaiKhoan`);
 
 --
--- Chỉ mục cho bảng `hoadonluutru`
+-- Indexes for table `hoadonluutru`
 --
 ALTER TABLE `hoadonluutru`
   ADD PRIMARY KEY (`MaHD`),
   ADD KEY `FK_MaPDKLTHD` (`MaPDK`);
 
 --
--- Chỉ mục cho bảng `hoadonnoithat`
+-- Indexes for table `hoadonnoithat`
 --
 ALTER TABLE `hoadonnoithat`
   ADD PRIMARY KEY (`MaHD`),
   ADD KEY `FK_PDKNT` (`MaPDK`);
 
 --
--- Chỉ mục cho bảng `hoadonthuembdv`
+-- Indexes for table `hoadonthuembdv`
 --
 ALTER TABLE `hoadonthuembdv`
   ADD PRIMARY KEY (`MaHD`,`MaMB`),
   ADD KEY `FK_MaHopDongMBDV` (`MaHopDong`);
 
 --
--- Chỉ mục cho bảng `hopdong`
+-- Indexes for table `hopdong`
 --
 ALTER TABLE `hopdong`
   ADD PRIMARY KEY (`MaHopDong`),
@@ -1266,14 +1266,14 @@ ALTER TABLE `hopdong`
   ADD KEY `FK_MaMBDV` (`MaMB`);
 
 --
--- Chỉ mục cho bảng `kythuat`
+-- Indexes for table `kythuat`
 --
 ALTER TABLE `kythuat`
   ADD PRIMARY KEY (`MaNV`),
   ADD KEY `FK_TenCNKT` (`TenCN`);
 
 --
--- Chỉ mục cho bảng `matbangdichvu`
+-- Indexes for table `matbangdichvu`
 --
 ALTER TABLE `matbangdichvu`
   ADD PRIMARY KEY (`MaMB`),
@@ -1281,147 +1281,147 @@ ALTER TABLE `matbangdichvu`
   ADD KEY `FK_MaNVMBDV` (`MaNV`);
 
 --
--- Chỉ mục cho bảng `nguoithan`
+-- Indexes for table `nguoithan`
 --
 ALTER TABLE `nguoithan`
   ADD PRIMARY KEY (`SV_CCCD`);
 
 --
--- Chỉ mục cho bảng `nguoithuematbang`
+-- Indexes for table `nguoithuematbang`
 --
 ALTER TABLE `nguoithuematbang`
   ADD PRIMARY KEY (`CCCD`);
 
 --
--- Chỉ mục cho bảng `nhanvien`
+-- Indexes for table `nhanvien`
 --
 ALTER TABLE `nhanvien`
   ADD PRIMARY KEY (`MaNV`),
   ADD UNIQUE KEY `CCCD_UNIQUE` (`CCCD`);
 
 --
--- Chỉ mục cho bảng `phieudangky`
+-- Indexes for table `phieudangky`
 --
 ALTER TABLE `phieudangky`
   ADD PRIMARY KEY (`MaPDK`),
   ADD KEY `FK_TenTaiKhoan` (`TenTaiKhoan`);
 
 --
--- Chỉ mục cho bảng `phieudangkycsvc`
+-- Indexes for table `phieudangkycsvc`
 --
 ALTER TABLE `phieudangkycsvc`
   ADD PRIMARY KEY (`MaPDK`),
   ADD KEY `FK_TenCSVC` (`TenCSVC`);
 
 --
--- Chỉ mục cho bảng `phieudangkyluutru`
+-- Indexes for table `phieudangkyluutru`
 --
 ALTER TABLE `phieudangkyluutru`
   ADD PRIMARY KEY (`MaPDK`);
 
 --
--- Chỉ mục cho bảng `phieudangkynoithat`
+-- Indexes for table `phieudangkynoithat`
 --
 ALTER TABLE `phieudangkynoithat`
   ADD PRIMARY KEY (`MaPDK`);
 
 --
--- Chỉ mục cho bảng `phong`
+-- Indexes for table `phong`
 --
 ALTER TABLE `phong`
   ADD PRIMARY KEY (`TenTN`,`SoPhong`);
 
 --
--- Chỉ mục cho bảng `sinhvien`
+-- Indexes for table `sinhvien`
 --
 ALTER TABLE `sinhvien`
   ADD PRIMARY KEY (`CCCD`),
   ADD KEY `FK_TenTNSV` (`TenTN`);
 
 --
--- Chỉ mục cho bảng `sodienthoainv`
+-- Indexes for table `sodienthoainv`
 --
 ALTER TABLE `sodienthoainv`
   ADD PRIMARY KEY (`MaNV`,`SoDienThoai`);
 
 --
--- Chỉ mục cho bảng `sodienthoaisv`
+-- Indexes for table `sodienthoaisv`
 --
 ALTER TABLE `sodienthoaisv`
   ADD PRIMARY KEY (`CCCD`);
 
 --
--- Chỉ mục cho bảng `taikhoannv`
+-- Indexes for table `taikhoannv`
 --
 ALTER TABLE `taikhoannv`
   ADD PRIMARY KEY (`TenTaiKhoan`),
   ADD KEY `FK_MaNVTK` (`MaNV`);
 
 --
--- Chỉ mục cho bảng `taikhoansv`
+-- Indexes for table `taikhoansv`
 --
 ALTER TABLE `taikhoansv`
   ADD PRIMARY KEY (`TenTaiKhoan`),
   ADD UNIQUE KEY `CCCD_UNIQUE` (`CCCD`);
 
 --
--- Chỉ mục cho bảng `tapvu`
+-- Indexes for table `tapvu`
 --
 ALTER TABLE `tapvu`
   ADD PRIMARY KEY (`MaNV`),
   ADD KEY `FK_TenTNTV` (`TenTN`);
 
 --
--- Chỉ mục cho bảng `toanha`
+-- Indexes for table `toanha`
 --
 ALTER TABLE `toanha`
   ADD PRIMARY KEY (`TenTN`),
   ADD KEY `FK_TenCNTN` (`TenCN`);
 
 --
--- Chỉ mục cho bảng `truongcumnha`
+-- Indexes for table `truongcumnha`
 --
 ALTER TABLE `truongcumnha`
   ADD PRIMARY KEY (`MaNV`),
   ADD KEY `FK_TenCNTCN` (`TenCN`);
 
 --
--- Chỉ mục cho bảng `truongtoanha`
+-- Indexes for table `truongtoanha`
 --
 ALTER TABLE `truongtoanha`
   ADD PRIMARY KEY (`MaNV`),
   ADD KEY `FK_TenTNTTN` (`TenTN`);
 
 --
--- AUTO_INCREMENT cho các bảng đã đổ
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT cho bảng `admin`
+-- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
   MODIFY `id` tinyint(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- Các ràng buộc cho các bảng đã đổ
+-- Constraints for dumped tables
 --
 
 --
--- Các ràng buộc cho bảng `baove`
+-- Constraints for table `baove`
 --
 ALTER TABLE `baove`
   ADD CONSTRAINT `FK_MaNVBV` FOREIGN KEY (`MaNV`) REFERENCES `nhanvien` (`MaNV`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_TenCNBV` FOREIGN KEY (`TenCN`) REFERENCES `cumnha` (`TenCN`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `cosovatchat`
+-- Constraints for table `cosovatchat`
 --
 ALTER TABLE `cosovatchat`
-  ADD CONSTRAINT `FK_MaNVCSVC` FOREIGN KEY (`MaNV`) REFERENCES `truongcumnha` (`MaNV`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_MaNVCSVC` FOREIGN KEY (`MaNVQL`) REFERENCES `truongcumnha` (`MaNV`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_TenCNCSVC` FOREIGN KEY (`TenCN`) REFERENCES `cumnha` (`TenCN`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `hoadoncsvc`
+-- Constraints for table `hoadoncsvc`
 --
 ALTER TABLE `hoadoncsvc`
   ADD CONSTRAINT `FK_HoaDonCSVC` FOREIGN KEY (`MaHD`) REFERENCES `hoadon` (`MaHD`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -1429,143 +1429,143 @@ ALTER TABLE `hoadoncsvc`
   ADD CONSTRAINT `FK_TenCSVCHD` FOREIGN KEY (`TenCSVC`) REFERENCES `cosovatchat` (`TenCSVC`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `hoadondiennuoc`
+-- Constraints for table `hoadondiennuoc`
 --
 ALTER TABLE `hoadondiennuoc`
   ADD CONSTRAINT `FK_MaHDDN` FOREIGN KEY (`MaHD`) REFERENCES `hoadon` (`MaHD`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_TenTaiKhoanDN` FOREIGN KEY (`TenTaiKhoan`) REFERENCES `taikhoansv` (`TenTaiKhoan`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `hoadonluutru`
+-- Constraints for table `hoadonluutru`
 --
 ALTER TABLE `hoadonluutru`
   ADD CONSTRAINT `FK_MaHDLT` FOREIGN KEY (`MaHD`) REFERENCES `hoadon` (`MaHD`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_MaPDKLTHD` FOREIGN KEY (`MaPDK`) REFERENCES `phieudangkyluutru` (`MaPDK`);
 
 --
--- Các ràng buộc cho bảng `hoadonnoithat`
+-- Constraints for table `hoadonnoithat`
 --
 ALTER TABLE `hoadonnoithat`
   ADD CONSTRAINT `FK_MaHDNT` FOREIGN KEY (`MaHD`) REFERENCES `hoadon` (`MaHD`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_PDKNT` FOREIGN KEY (`MaPDK`) REFERENCES `phieudangkynoithat` (`MaPDK`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Các ràng buộc cho bảng `hoadonthuembdv`
+-- Constraints for table `hoadonthuembdv`
 --
 ALTER TABLE `hoadonthuembdv`
   ADD CONSTRAINT `FK_MaHDMBDV` FOREIGN KEY (`MaHD`) REFERENCES `hoadon` (`MaHD`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_MaHopDongMBDV` FOREIGN KEY (`MaHopDong`) REFERENCES `hopdong` (`MaHopDong`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `hopdong`
+-- Constraints for table `hopdong`
 --
 ALTER TABLE `hopdong`
   ADD CONSTRAINT `FK_CCCD` FOREIGN KEY (`CCCD`) REFERENCES `nguoithuematbang` (`CCCD`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_MaMBDV` FOREIGN KEY (`MaMB`) REFERENCES `matbangdichvu` (`MaMB`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `kythuat`
+-- Constraints for table `kythuat`
 --
 ALTER TABLE `kythuat`
   ADD CONSTRAINT `FK_MaNVKT` FOREIGN KEY (`MaNV`) REFERENCES `nhanvien` (`MaNV`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_TenCNKT` FOREIGN KEY (`TenCN`) REFERENCES `cumnha` (`TenCN`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `matbangdichvu`
+-- Constraints for table `matbangdichvu`
 --
 ALTER TABLE `matbangdichvu`
   ADD CONSTRAINT `FK_MaNVMBDV` FOREIGN KEY (`MaNV`) REFERENCES `truongcumnha` (`MaNV`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_TenCNMBDV` FOREIGN KEY (`TenCN`) REFERENCES `cumnha` (`TenCN`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `nguoithan`
+-- Constraints for table `nguoithan`
 --
 ALTER TABLE `nguoithan`
   ADD CONSTRAINT `FK_SVCCCD` FOREIGN KEY (`SV_CCCD`) REFERENCES `sinhvien` (`CCCD`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `phieudangky`
+-- Constraints for table `phieudangky`
 --
 ALTER TABLE `phieudangky`
   ADD CONSTRAINT `FK_TenTaiKhoan` FOREIGN KEY (`TenTaiKhoan`) REFERENCES `taikhoansv` (`TenTaiKhoan`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Các ràng buộc cho bảng `phieudangkycsvc`
+-- Constraints for table `phieudangkycsvc`
 --
 ALTER TABLE `phieudangkycsvc`
   ADD CONSTRAINT `FK_MaPDKCSVC` FOREIGN KEY (`MaPDK`) REFERENCES `phieudangky` (`MaPDK`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_TenCSVC` FOREIGN KEY (`TenCSVC`) REFERENCES `cosovatchat` (`TenCSVC`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Các ràng buộc cho bảng `phieudangkyluutru`
+-- Constraints for table `phieudangkyluutru`
 --
 ALTER TABLE `phieudangkyluutru`
   ADD CONSTRAINT `FK_MaPDKLT` FOREIGN KEY (`MaPDK`) REFERENCES `phieudangky` (`MaPDK`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `phieudangkynoithat`
+-- Constraints for table `phieudangkynoithat`
 --
 ALTER TABLE `phieudangkynoithat`
   ADD CONSTRAINT `FK_MaPDKNT` FOREIGN KEY (`MaPDK`) REFERENCES `phieudangky` (`MaPDK`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `phong`
+-- Constraints for table `phong`
 --
 ALTER TABLE `phong`
   ADD CONSTRAINT `FK_TenTN` FOREIGN KEY (`TenTN`) REFERENCES `toanha` (`TenTN`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `sinhvien`
+-- Constraints for table `sinhvien`
 --
 ALTER TABLE `sinhvien`
   ADD CONSTRAINT `FK_TenTNSV` FOREIGN KEY (`TenTN`) REFERENCES `phong` (`TenTN`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `sodienthoainv`
+-- Constraints for table `sodienthoainv`
 --
 ALTER TABLE `sodienthoainv`
   ADD CONSTRAINT `FK_MaNVSDT` FOREIGN KEY (`MaNV`) REFERENCES `nhanvien` (`MaNV`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `sodienthoaisv`
+-- Constraints for table `sodienthoaisv`
 --
 ALTER TABLE `sodienthoaisv`
   ADD CONSTRAINT `FK_CCCDSDT` FOREIGN KEY (`CCCD`) REFERENCES `sinhvien` (`CCCD`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `taikhoannv`
+-- Constraints for table `taikhoannv`
 --
 ALTER TABLE `taikhoannv`
   ADD CONSTRAINT `FK_MaNVTK` FOREIGN KEY (`MaNV`) REFERENCES `nhanvien` (`MaNV`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `taikhoansv`
+-- Constraints for table `taikhoansv`
 --
 ALTER TABLE `taikhoansv`
   ADD CONSTRAINT `FK_CCCDTK` FOREIGN KEY (`CCCD`) REFERENCES `sinhvien` (`CCCD`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `tapvu`
+-- Constraints for table `tapvu`
 --
 ALTER TABLE `tapvu`
   ADD CONSTRAINT `FK_MaNVTV` FOREIGN KEY (`MaNV`) REFERENCES `nhanvien` (`MaNV`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_TenTNTV` FOREIGN KEY (`TenTN`) REFERENCES `toanha` (`TenTN`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `toanha`
+-- Constraints for table `toanha`
 --
 ALTER TABLE `toanha`
   ADD CONSTRAINT `FK_TenCNTN` FOREIGN KEY (`TenCN`) REFERENCES `cumnha` (`TenCN`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `truongcumnha`
+-- Constraints for table `truongcumnha`
 --
 ALTER TABLE `truongcumnha`
   ADD CONSTRAINT `FK_MaNVTCN` FOREIGN KEY (`MaNV`) REFERENCES `nhanvien` (`MaNV`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_TenCNTCN` FOREIGN KEY (`TenCN`) REFERENCES `cumnha` (`TenCN`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `truongtoanha`
+-- Constraints for table `truongtoanha`
 --
 ALTER TABLE `truongtoanha`
   ADD CONSTRAINT `FK_MaNVTTN` FOREIGN KEY (`MaNV`) REFERENCES `nhanvien` (`MaNV`) ON DELETE CASCADE ON UPDATE CASCADE,

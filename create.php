@@ -2,17 +2,44 @@
 require_once './db_connection.php';
 if (isset($_POST['add'])) {
     $TenCSVC = $_POST['TenCSVC'];
-    $ViTri = $_POST['ViTri'];
+    $TinhTrang = $_POST['TinhTrang'];
     $GiaThue = $_POST['GiaThue'];
     $GioMoCua = $_POST['GioMoCua'];
     $GioDongCua = $_POST['GioDongCua'];
     $TenCN = $_POST['TenCN'];
     $MaNVQL = $_POST['MaNVQL'];
-    if ($TenCSVC == '' || $ViTri == '' || $GiaThue == '' || $GioMoCua == '' || $GioDongCua == '' || $TenCN == '' || $MaNVQL == '') {
-        $tb = 'Bạn chưa nhập đủ các trường' . '<br/>';
-    } else {
-        $sqlInsert = "INSERT INTO cosovatchat (TenCSVC, ViTri, GiaThue, GioMoCua, GioDongCua, TenCN, MaNVQL) 
-                     VALUES ('$TenCSVC', '$ViTri', '$GiaThue', '$GioMoCua', '$GioDongCua', '$TenCN', '$MaNVQL')";
+    $tb='';
+    $ok=true;
+    // if ($TenCSVC == '' || $TinhTrang == '' || $GiaThue == '' || $GioMoCua == '' || $GioDongCua == '' || $TenCN == '' || $MaNVQL == '') {
+    //     $tb = 'Bạn chưa nhập đủ các trường' . '<br/>';
+    if ($TenCSVC==''){
+        $tb .= 'Bạn chưa nhập tên cơ sở vật chất' . '<br/>';
+        $ok=false;
+    } if ($TinhTrang==''){
+        $tb .= 'Bạn chưa nhập tình trạng' . '<br/>';
+        $ok=false;
+    } if ($GiaThue==''){
+        $tb .= 'Bạn chưa nhập giá thuê' . '<br/>';
+        $ok=false;
+    } if ($GioMoCua==''){
+        $tb .= 'Bạn chưa nhập giờ mở cửa' . '<br/>';
+        $ok=false;
+    }elseif ($GioMoCua < '16:00:44'){
+
+    }
+     if ($GioDongCua==''){
+        $tb .= 'Bạn chưa nhập giờ đóng cửa' . '<br/>';
+        $ok=false;
+    } if ($TenCN==''){
+        $tb .= 'Bạn chưa nhập tên cụm nhà' . '<br/>';
+        $ok=false;
+    } if ($MaNVQL==''){
+        $tb .= 'Bạn chưa nhập mã nhân viên quản lí' . '<br/>';
+        $ok=false;
+    }
+    if($ok){
+        $sqlInsert = "INSERT INTO cosovatchat (TenCSVC, TinhTrang, GiaThue, GioMoCua, GioDongCua, TenCN, MaNVQL) 
+                     VALUES ('$TenCSVC', '$TinhTrang', '$GiaThue', '$GioMoCua', '$GioDongCua', '$TenCN', '$MaNVQL')";
         $conn->query($sqlInsert);
         setcookie('thongBao', 'Đã thêm cơ sở vật chất thành công', time() + 5);
         header("location: index.php");
@@ -42,7 +69,7 @@ if (isset($_POST['add'])) {
             <div class="col-6">
                 <div class="shadow p-3 my-5 rounded">
                     <?php
-                    if (isset($tb)) {
+                    if ( isset($tb) ) {
                         echo '<div class="row"><div class="alert alert-danger">' . $tb . '</div></div>';
                     }
                     ?>
@@ -57,8 +84,8 @@ if (isset($_POST['add'])) {
                                 <input type="text" class="form-control" placeholder="Tên cụm nhà" name="TenCN" aria-describedby="TenCN">
                             </div>
                             <div class="form-floating">
-                                <input class="form-control my-3" placeholder="Nhập vị trí" id="viTri" name="ViTri"></input>
-                                <label for="ViTri">Vị trí</label>
+                                <input class="form-control my-3" placeholder="Nhập Tình Trạng" id="TinhTrang" name="TinhTrang"></input>
+                                <label for="TinhTrang">Tình Trạng</label>
                             </div>
                             <div class="input-group mb-3">
                                 <span class="input-group-text">Giá thuê</span>
@@ -76,13 +103,13 @@ if (isset($_POST['add'])) {
 
                             </div>
                             <div class="form-floating">
-                                <input class="form-control my-3" placeholder="Nhập vị trí" id="MaNVQL" name="MaNVQL"></input>
+                                <input class="form-control my-3" placeholder="Nhập Tình Trạng" id="MaNVQL" name="MaNVQL"></input>
                                 <label for="MaNVQL">Mã số nhân viên quản lí</label>
                             </div>
                             <div class="d-flex justify-content-evenly mt-3">
                                 <a href="index.php" class="btn btn-secondary">Hủy bỏ</a>
                                 <!-- <a href="index.php" class="btn btn-primary">Xác nhận</a> -->
-                                <input type="submit" class="btn btn-primary" value="Cập nhật" name="add">
+                                <input type="submit" class="btn btn-primary" value="Thêm" name="add">
                             </div>
                     </form>
                 </div>

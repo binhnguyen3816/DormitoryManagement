@@ -11,19 +11,19 @@ $cosovatchat = $conn->query($sqlFindProduct);
 // khi nút update được nhấn
 if (isset($_POST['update'])) {
     $TenCSVC = $_POST['TenCSVC'];
-    $ViTri = $_POST['ViTri'];
+    $TinhTrang = $_POST['TinhTrang'];
     $GiaThue = $_POST['GiaThue'];
     $GioMoCua = $_POST['GioMoCua'];
     $GioDongCua = $_POST['GioDongCua'];
     $TenCN = $_POST['TenCN'];
     $MaNVQL = $_POST['MaNVQL'];
-    if ($TenCSVC == '' || $ViTri == '' || $GiaThue == '' || $GioMoCua == '' || $GioDongCua == '' || $TenCN == '' || $MaNVQL == '') {
+    if ($TenCSVC == '' || $TinhTrang == '' || $GiaThue == '' || $GioMoCua == '' || $GioDongCua == '' || $TenCN == '' || $MaNVQL == '') {
         $tb = 'Bạn chưa nhập đủ các trường' . '<br/>';
     } else {
-        // $sqlInsert = "INSERT INTO cosovatchat (TenCSVC, ViTri, GiaThue, GioMoCua, GioDongCua, TenCN, MaNVQL) 
-        //              VALUES ('$TenCSVC', '$ViTri', '$GiaThue', '$GioMoCua', '$GioDongCua', '$TenCN', '$MaNVQL')";
+        // $sqlInsert = "INSERT INTO cosovatchat (TenCSVC, TinhTrang, GiaThue, GioMoCua, GioDongCua, TenCN, MaNVQL) 
+        //              VALUES ('$TenCSVC', '$TinhTrang', '$GiaThue', '$GioMoCua', '$GioDongCua', '$TenCN', '$MaNVQL')";
         $sqlUpdate = "UPDATE cosovatchat 
-                    SET TenCSVC = '$TenCSVC', ViTri = '$ViTri', GiaThue = '$GiaThue', GioMoCua = '$GioMoCua', GioDongCua = '$GioDongCua', TenCN = '$TenCN', MaNVQL = '$MaNVQL' 
+                    SET TenCSVC = '$TenCSVC', TinhTrang = '$TinhTrang', GiaThue = '$GiaThue', GioMoCua = '$GioMoCua', GioDongCua = '$GioDongCua', TenCN = '$TenCN', MaNVQL = '$MaNVQL' 
                     WHERE TenCSVC = '$TenCSVC'";
         $conn->query($sqlUpdate);
         setcookie('thongBao', 'Đã cập nhật cơ sở vật chất thành công', time() + 5);
@@ -64,7 +64,7 @@ if (isset($_POST['update'])) {
                         ?>
                         <h1 class="text-center display-6 p-2">Sửa thông tin</h2>
                             <div class="form-floating">
-                                <input class="form-control my-3" placeholder="Nhập tên cơ sở vật chất" id="TenCSVC" name="TenCSVC" value="<?= $cosovatchat['TenCSVC'] ?>"></input>
+                                <input class="form-control my-3" placeholder="Nhập tên cơ sở vật chất" id="TenCSVC" name="TenCSVC" value="<?= $cosovatchat['TenCSVC'] ?>" disabled></input>
                                 <label for="TenCSVC">Tên cơ sở vật chất</label>
                             </div>
                             <div class="input-group mb-3">
@@ -72,8 +72,8 @@ if (isset($_POST['update'])) {
                                 <input type="text" class="form-control" placeholder="Tên cụm nhà" name="TenCN" value="<?= $cosovatchat['TenCN'] ?>">
                             </div>
                             <div class="form-floating">
-                                <input class="form-control my-3" placeholder="Nhập vị trí" id="viTri" name="ViTri" value="<?= $cosovatchat['ViTri'] ?>"></input>
-                                <label for="ViTri">Vị trí</label>
+                                <input class="form-control my-3" placeholder="Nhập Tình Trạng" id="TinhTrang" name="TinhTrang" value="<?= $cosovatchat['TinhTrang'] ?>"></input>
+                                <label for="TinhTrang">Tình Trạng</label>
                             </div>
                             <div class="input-group mb-3">
                                 <span class="input-group-text">Giá thuê</span>
@@ -87,7 +87,7 @@ if (isset($_POST['update'])) {
                                 <input type="text" class="form-control" placeholder="Eg: 20:00:00" name="GioDongCua" value="<?= $cosovatchat['GioDongCua'] ?>">
                             </div>
                             <div class="form-floating">
-                                <input class="form-control my-3" placeholder="Nhập vị trí" id="MaNVQL" name="MaNVQL" value="<?= $cosovatchat['MaNVQL'] ?>"></input>
+                                <input class="form-control my-3" placeholder="Nhập Tình Trạng" id="MaNVQL" name="MaNVQL" value="<?= $cosovatchat['MaNVQL'] ?>"></input>
                                 <label for="MaNVQL">Mã số nhân viên</label>
                             </div>
                             <div class="d-flex justify-content-evenly mt-3">
