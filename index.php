@@ -22,22 +22,26 @@ $cosovatchat = $conn->query($sqlShowcosovatchat);
 </head>
 
 <body>
-    <div class="w-100">
+    <!-- Container -->
+    <div class="container-fluid">
         <div class="row">
-            <div class="col-2 auto text-bg-light  bg-opacity-75 shadow-lg" style="min-height: 100vh;background-color:rgba(0,0,0,0.6)">
+            <!-- Sidebar -->
+            <div class="col-2 auto text-bg-light  bg-opacity-75 shadow-lg px-0" style="min-height: 100vh;background-color:rgba(0,0,0,0.6)">
                 <h5 class="text-center display-6 m-4" style="width:fit-content;height:fit-content">Quản lí KTX</h5>
                 <ul class="nav flex-column m-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.php">Quản lí cơ sở vật chất</a>
+                        <a class="nav-link hvr-sweep-to-right w-100 " aria-current="page" href="index.php">Quản lí cơ sở vật chất</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="">Link</a>
+                        <a class="nav-link hvr-sweep-to-right w-100" href="">Link</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
+                        <a class="nav-link hvr-sweep-to-right w-100" href="#">Link</a>
                     </li>
                 </ul>
             </div>
+
+            <!-- Content -->
             <div class="col-10 auto text-bg-light  bg-opacity-75" style="min-height: 100vh;background-color:rgba(0,0,0,0.6)">
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="text-center display-5 m-4" style="width:fit-content;height:fit-content">Cơ sở vật chất</h2>
@@ -49,7 +53,6 @@ $cosovatchat = $conn->query($sqlShowcosovatchat);
                     <thead class="table-light">
                         <tr>
                             <th scope="col">Tên cơ sở vật chất</th>
-
                             <th scope="col">Giá thuê</th>
                             <th scope="col">Giờ mở cửa</th>
                             <th scope="col">Giờ đóng cửa</th>
@@ -71,7 +74,14 @@ $cosovatchat = $conn->query($sqlShowcosovatchat);
                                 <td><?= $row['GioDongCua'] ?></td>
                                 <td><?= $row['TenCN'] ?></td>
                                 <td><?= $row['MaNVQL'] ?></td>
-                                <td><span class="badge rounded-pill text-bg-success p-2"><?= $row['TinhTrang'] ?></span></td>
+                                <td>
+                                    <?php
+                                    if ($row['TinhTrang'] == 'đang hoạt động') { ?>
+                                        <span class="text-success"><?php echo $row['TinhTrang']; ?></span>
+                                    <?php } else { ?>
+                                        <span class="text-secondary"><?php echo $row['TinhTrang']; ?></span>
+                                    <?php } ?>
+                                </td>
                                 <td class="d-flex">
                                     <p>
                                         <a href="./update.php?TenCSVC=<?= $row['TenCSVC'] ?>" class="link-info p-2 link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Chỉnh sửa</a>
@@ -88,8 +98,8 @@ $cosovatchat = $conn->query($sqlShowcosovatchat);
                 </table>
             </div>
         </div>
-    </div>
-    <script src=" https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        </divc>
+        <script src=" https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
