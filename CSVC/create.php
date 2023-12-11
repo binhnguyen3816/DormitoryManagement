@@ -1,5 +1,5 @@
 <?php
-require_once './db_connection.php';
+require_once '../db_connection.php';
 if (isset($_POST['add'])) {
     $TenCSVC = $_POST['TenCSVC'];
     $TinhTrang = $_POST['TinhTrang'];
@@ -89,7 +89,7 @@ if (isset($_POST['add'])) {
                             </div>
                             <div class="input-group mb-3">
                                 <span class="input-group-text">Giá thuê</span>
-                                <input type="text" class="form-control" placeholder="Eg:20000" name="GiaThue">
+                                <input type="number" class="form-control" placeholder="Eg:20000" name="GiaThue">
                                 <span class="input-group-text">VNĐ</span>
                             </div>
                             <div class="input-group mb-3">
@@ -100,7 +100,6 @@ if (isset($_POST['add'])) {
                                 <span class="input-group-text">Giờ đóng cửa</span>
                                 <!-- <input type="text" class="form-control" placeholder="Eg: 20:00:00" name="gioDongCua"> -->
                                 <input type="time" class="form-control" placeholder="Eg: 22:00" name="GioDongCua">
-
                             </div>
                             <div class="form-floating">
                                 <input class="form-control my-3" placeholder="Nhập Tình Trạng" id="MaNVQL" name="MaNVQL"></input>

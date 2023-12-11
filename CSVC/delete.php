@@ -1,6 +1,6 @@
 <?php
    
-    require_once './db_connection.php';
+    require_once '../db_connection.php';
   
     if (isset($_GET['TenCSVC'])) {
         $TenCSVC = $_GET['TenCSVC'];
