@@ -18,7 +18,7 @@ $cosovatchat = $conn->query($sqlShowcosovatchat);
     <title>Quản lí kí túc xá</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="./assets/style.css">
+    <link rel="stylesheet" href="../assets/style.css">
 </head>
 
 <body>
@@ -27,27 +27,16 @@ $cosovatchat = $conn->query($sqlShowcosovatchat);
         <div class="row">
             <!-- Sidebar -->
             <div class="col-2 auto text-bg-light  bg-opacity-75 shadow-lg px-0" style="min-height: 100vh;background-color:rgba(0,0,0,0.6)">
-                <h5 class="text-center display-6 m-4" style="width:fit-content;height:fit-content">Quản lí KTX</h5>
-                <ul class="nav flex-column m-0">
-                    <li class="nav-item">
-                        <a class="nav-link hvr-sweep-to-right w-100 " href="../CSVC/index.php">Quản lí cơ sở vật chất</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link hvr-sweep-to-right w-100" href="../Statistics/index.php">Thống kê</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link hvr-sweep-to-right w-100" href="../Bill/index.php">Hóa đơn</a>
-                    </li>
-                </ul>
+                <?php include '../assets/sidebar.html' ;?>
             </div>
 
             <!-- Content -->
             <div class="col-10 auto text-bg-light  bg-opacity-75" style="min-height: 100vh;background-color:rgba(0,0,0,0.6)">
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="text-center display-5 m-4" style="width:fit-content;height:fit-content">Cơ sở vật chất</h2>
-                        <p class="my-5 text-center">
-                            <a href="create.php" class="btn btn-primary p-3" style="width:fit-content">Thêm cơ sở vật chất</a>
-                        </p>
+                    <p class="my-5 text-center">
+                        <a href="create.php" class="btn btn-primary p-3" style="width:fit-content">Thêm cơ sở vật chất</a>
+                    </p>
                 </div>
                 <table class="shadow table caption-top rounded overflow-hidden">
                     <thead class="table-light">
@@ -79,7 +68,7 @@ $cosovatchat = $conn->query($sqlShowcosovatchat);
                                     if ($row['TinhTrang'] == 'đang hoạt động') { ?>
                                         <span class="text-success"><?php echo $row['TinhTrang']; ?></span>
                                     <?php } else { ?>
-                                        <span class="text-secondary"><?php echo $row['TinhTrang']; ?></span>
+                                        <span class="text-danger"><?php echo $row['TinhTrang']; ?></span>
                                     <?php } ?>
                                 </td>
                                 <td class="d-flex">

@@ -64,7 +64,7 @@ if (isset($_POST['update'])) {
                         ?>
                         <h1 class="text-center display-6 p-2">Sửa thông tin</h2>
                             <div class="form-floating">
-                                <input class="form-control my-3" placeholder="Nhập tên cơ sở vật chất" id="TenCSVC" name="TenCSVC" value="<?= $cosovatchat['TenCSVC'] ?>" disabled></input>
+                                <input class="form-control my-3" placeholder="Nhập tên cơ sở vật chất" id="TenCSVC" name="TenCSVC" value="<?= $cosovatchat['TenCSVC'] ?>" ></input>
                                 <label for="TenCSVC">Tên cơ sở vật chất</label>
                             </div>
                             <div class="input-group mb-3">
@@ -77,14 +77,14 @@ if (isset($_POST['update'])) {
                             </div>
                             <div class="input-group mb-3">
                                 <span class="input-group-text">Giá thuê</span>
-                                <input type="text" class="form-control" placeholder="Eg:20000" name="GiaThue" value="<?= $cosovatchat['GiaThue'] ?>">
+                                <input type="number" class="form-control" placeholder="Eg:20000" name="GiaThue" value="<?= $cosovatchat['GiaThue'] ?>">
                                 <span class="input-group-text">VNĐ</span>
                             </div>
                             <div class="input-group mb-3">
                                 <span class="input-group-text">Giờ mở cửa</span>
-                                <input type="text" class="form-control" placeholder="Eg: 6:00:00" name="GioMoCua" value="<?= $cosovatchat['GioMoCua'] ?>">
+                                <input type="time" class="form-control" placeholder="Eg: 6:00:00" name="GioMoCua" value="<?= $cosovatchat['GioMoCua'] ?>">
                                 <span class="input-group-text">Giờ đóng cửa</span>
-                                <input type="text" class="form-control" placeholder="Eg: 20:00:00" name="GioDongCua" value="<?= $cosovatchat['GioDongCua'] ?>">
+                                <input type="time" class="form-control" placeholder="Eg: 20:00:00" name="GioDongCua" value="<?= $cosovatchat['GioDongCua'] ?>">
                             </div>
                             <div class="form-floating">
                                 <input class="form-control my-3" placeholder="Nhập Tình Trạng" id="MaNVQL" name="MaNVQL" value="<?= $cosovatchat['MaNVQL'] ?>"></input>
