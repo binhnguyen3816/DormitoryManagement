@@ -17,17 +17,70 @@ if (isset($_POST['update'])) {
     $GioDongCua = $_POST['GioDongCua'];
     $TenCN = $_POST['TenCN'];
     $MaNVQL = $_POST['MaNVQL'];
+    $tb = null;
+    $ok = true;
     if ($TenCSVC == '' || $TinhTrang == '' || $GiaThue == '' || $GioMoCua == '' || $GioDongCua == '' || $TenCN == '' || $MaNVQL == '') {
         $tb = 'Bạn chưa nhập đủ các trường' . '<br/>';
     } else {
+        // Check if valid TinhTrang
+        if ($TinhTrang != '') {
+            if ($TinhTrang != 'đang hoạt động' && $TinhTrang != 'ngừng hoạt động') {
+                $tb .= "Tình trạng 'đang hoạt động' hoặc 'ngừng hoạt động'" . '<br/>';
+                $ok = false;
+            }
+        }
+        // Check if valid TenCN
+        if ($TenCN != '') {
+            $check = false;
+            $maNVQLquery = "SELECT TenCN FROM cumnha";
+            $maNVQLdata = $conn->query($maNVQLquery);
+            if (
+                $maNVQLdata->num_rows > 0
+            ) {
+                while ($row = $maNVQLdata->fetch_assoc()) {
+                    if ($row['TenCN'] === $TenCN) {
+                        $check = true;
+                        break;
+                    } else {
+                        $check = false;
+                    }
+                }
+                if ($check === false) {
+                    $tb .= 'Tên cụm nhà không tồn tại' . '<br/>';
+                    $ok = false;
+                }
+            }
+        }
+        // Check if valid MaNVQL
+        if ($MaNVQL != '') {
+            $check = false;
+            $maNVQLquery = "SELECT MaNV FROM truongcumnha";
+            $maNVQLdata = $conn->query($maNVQLquery);
+            if ($maNVQLdata->num_rows > 0) {
+                while ($row = $maNVQLdata->fetch_assoc()) {
+                    if ($row['MaNV'] === $MaNVQL) {
+                        $check = true;
+                        break;
+                    } else {
+                        $check = false;
+                    }
+                }
+                if ($check === false) {
+                    $tb .= 'Mã nhân viên quản lí không tồn tại' . '<br/>';
+                    $ok = false;
+                }
+            }
+        }
         // $sqlInsert = "INSERT INTO cosovatchat (TenCSVC, TinhTrang, GiaThue, GioMoCua, GioDongCua, TenCN, MaNVQL) 
         //              VALUES ('$TenCSVC', '$TinhTrang', '$GiaThue', '$GioMoCua', '$GioDongCua', '$TenCN', '$MaNVQL')";
-        $sqlUpdate = "UPDATE cosovatchat 
-                    SET TenCSVC = '$TenCSVC', TinhTrang = '$TinhTrang', GiaThue = '$GiaThue', GioMoCua = '$GioMoCua', GioDongCua = '$GioDongCua', TenCN = '$TenCN', MaNVQL = '$MaNVQL' 
-                    WHERE TenCSVC = '$TenCSVC'";
-        $conn->query($sqlUpdate);
-        setcookie('thongBao', 'Đã cập nhật cơ sở vật chất thành công', time() + 5);
-        header("location: index.php");
+        if ($ok === true) {
+            $sqlUpdate = "UPDATE cosovatchat 
+                        SET TenCSVC = '$TenCSVC', TinhTrang = '$TinhTrang', GiaThue = '$GiaThue', GioMoCua = '$GioMoCua', GioDongCua = '$GioDongCua', TenCN = '$TenCN', MaNVQL = '$MaNVQL' 
+                        WHERE TenCSVC = '$TenCSVC'";
+            $conn->query($sqlUpdate);
+            setcookie('thongBao', 'Đã cập nhật cơ sở vật chất thành công', time() + 5);
+            header("location: index.php");
+        }
     }
 }
 ?>

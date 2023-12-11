@@ -8,43 +8,96 @@ if (isset($_POST['add'])) {
     $GioDongCua = $_POST['GioDongCua'];
     $TenCN = $_POST['TenCN'];
     $MaNVQL = $_POST['MaNVQL'];
-    $tb='';
-    $ok=true;
+    $tb = '';
+    $ok = true;
     // if ($TenCSVC == '' || $TinhTrang == '' || $GiaThue == '' || $GioMoCua == '' || $GioDongCua == '' || $TenCN == '' || $MaNVQL == '') {
     //     $tb = 'Bạn chưa nhập đủ các trường' . '<br/>';
-    if ($TenCSVC==''){
-        $tb .= 'Bạn chưa nhập tên cơ sở vật chất' . '<br/>';
-        $ok=false;
-    } if ($TinhTrang==''){
-        $tb .= 'Bạn chưa nhập tình trạng' . '<br/>';
-        $ok=false;
-    } if ($GiaThue==''){
-        $tb .= 'Bạn chưa nhập giá thuê' . '<br/>';
-        $ok=false;
-    } if ($GioMoCua==''){
-        $tb .= 'Bạn chưa nhập giờ mở cửa' . '<br/>';
-        $ok=false;
-    }elseif ($GioMoCua < '16:00:44'){
 
+    if ($TenCSVC == '') {
+        $tb .= 'Bạn chưa nhập tên cơ sở vật chất' . '<br/>';
+        $ok = false;
     }
-     if ($GioDongCua==''){
+    if ($TinhTrang == '') {
+        $tb .= 'Bạn chưa nhập tình trạng' . '<br/>';
+        $ok = false;
+    }
+    if ($GiaThue == '') {
+        $tb .= 'Bạn chưa nhập giá thuê' . '<br/>';
+        $ok = false;
+    }
+    if ($GioMoCua == '') {
+        $tb .= 'Bạn chưa nhập giờ mở cửa' . '<br/>';
+        $ok = false;
+    } elseif ($GioMoCua < '16:00:44') {
+    }
+    if ($GioDongCua == '') {
         $tb .= 'Bạn chưa nhập giờ đóng cửa' . '<br/>';
-        $ok=false;
-    } if ($TenCN==''){
-        $tb .= 'Bạn chưa nhập tên cụm nhà' . '<br/>';
-        $ok=false;
-    } if ($MaNVQL==''){
-        $tb .= 'Bạn chưa nhập mã nhân viên quản lí' . '<br/>';
-        $ok=false;
+        $ok = false;
     }
-    if($ok){
+    if ($TenCN == '') {
+        $tb .= 'Bạn chưa nhập tên cụm nhà' . '<br/>';
+        $ok = false;
+    }
+    if ($MaNVQL == '') {
+        $tb .= 'Bạn chưa nhập mã nhân viên quản lí' . '<br/>';
+        $ok = false;
+    }
+    // Check if valid TinhTrang
+    if ($TinhTrang != '') {
+        if ($TinhTrang != 'đang hoạt động' && $TinhTrang != 'ngừng hoạt động') {
+            $tb .= "Tình trạng 'đang hoạt động' hoặc 'ngừng hoạt động'" . '<br/>';
+            $ok = false;
+        }
+    }
+    // Check if valid TenCN
+    if ($TenCN != '') {
+        $check = false;
+        $maNVQLquery = "SELECT TenCN FROM cumnha";
+        $maNVQLdata = $conn->query($maNVQLquery);
+        if ($maNVQLdata->num_rows > 0
+        ) {
+            while ($row = $maNVQLdata->fetch_assoc()) {
+                if ($row['TenCN'] === $TenCN) {
+                    $check = true;
+                    break;
+                } else {
+                    $check = false;
+                }
+            }
+            if ($check === false) {
+                $tb .= 'Tên cụm nhà không tồn tại' . '<br/>';
+                $ok = false;
+            }
+        }
+    }
+    // Check if valid MaNVQL
+    if ($MaNVQL != '') {
+        $check=false;
+        $maNVQLquery = "SELECT MaNV FROM truongcumnha";
+        $maNVQLdata = $conn->query($maNVQLquery);
+        if ($maNVQLdata->num_rows > 0) {
+            while ($row = $maNVQLdata->fetch_assoc()) {
+                if ($row['MaNV'] === $MaNVQL) {
+                   $check = true; 
+                   break;
+                } else {
+                    $check = false;
+                }
+                
+            }
+            if ($check === false) {
+                $tb .= 'Mã nhân viên quản lí không tồn tại' . '<br/>';
+                $ok = false;
+            }
+        }
+    }
+    if ($ok) {
         $sqlInsert = "INSERT INTO cosovatchat (TenCSVC, TinhTrang, GiaThue, GioMoCua, GioDongCua, TenCN, MaNVQL) 
                      VALUES ('$TenCSVC', '$TinhTrang', '$GiaThue', '$GioMoCua', '$GioDongCua', '$TenCN', '$MaNVQL')";
         $conn->query($sqlInsert);
         setcookie('thongBao', 'Đã thêm cơ sở vật chất thành công', time() + 5);
         header("location: index.php");
     }
-
 }
 ?>
 
@@ -69,7 +122,7 @@ if (isset($_POST['add'])) {
             <div class="col-6">
                 <div class="shadow p-3 my-5 rounded">
                     <?php
-                    if ( isset($tb) ) {
+                    if (isset($tb)) {
                         echo '<div class="row"><div class="alert alert-danger">' . $tb . '</div></div>';
                     }
                     ?>
