@@ -10,16 +10,52 @@ $cosovatchat = $conn->query($sqlFindProduct);
 
 // khi nút update được nhấn
 if (isset($_POST['update'])) {
-    $TenCSVC = $_POST['TenCSVC'];
     $TinhTrang = $_POST['TinhTrang'];
     $GiaThue = $_POST['GiaThue'];
     $GioMoCua = $_POST['GioMoCua'];
     $GioDongCua = $_POST['GioDongCua'];
     $TenCN = $_POST['TenCN'];
     $MaNVQL = $_POST['MaNVQL'];
-    if ($TenCSVC == '' || $TinhTrang == '' || $GiaThue == '' || $GioMoCua == '' || $GioDongCua == '' || $TenCN == '' || $MaNVQL == '') {
-        $tb = 'Bạn chưa nhập đủ các trường' . '<br/>';
-    } else {
+    $tb = '';
+    $ok = true;
+    if ($TenCSVC == '') {
+        $tb .= 'Bạn chưa nhập tên cơ sở vật chất' . '<br/>';
+        $ok = false;
+    }
+    if ($TinhTrang == '') {
+        $tb .= 'Bạn chưa nhập tình trạng' . '<br/>';
+        $ok = false;
+    }
+    if ($GiaThue == '') {
+        $tb .= 'Bạn chưa nhập giá thuê' . '<br/>';
+        $ok = false;
+    }
+    if ($GioMoCua == '') {
+        $tb .= 'Bạn chưa nhập giờ mở cửa' . '<br/>';
+        $ok = false;
+    } elseif (strtotime($GioMoCua) < strtotime("6:00:00")) {
+        $tb .= 'Giờ mở cửa phải lớn hơn 6h sáng' . '<br/>';
+        $ok = false;
+    }
+    if ($GioDongCua == '') {
+        $tb .= 'Bạn chưa nhập giờ đóng cửa' . '<br/>';
+        $ok = false;
+    } elseif (strtotime($GioDongCua) > strtotime("22:00:00")) {
+        $tb .= 'Giờ đóng cửa phải nhỏ hơn 10h tối' . '<br/>';
+        $ok = false;
+    } elseif ($GioDongCua < $GioMoCua) {
+        $tb .= 'Giờ đóng cửa phải lớn hơn giờ mở cửa' . '<br/>';
+        $ok = false;
+    }
+    if ($TenCN == '') {
+        $tb .= 'Bạn chưa nhập tên cụm nhà' . '<br/>';
+        $ok = false;
+    }
+    if ($MaNVQL == '') {
+        $tb .= 'Bạn chưa nhập mã nhân viên quản lí' . '<br/>';
+        $ok = false;
+    }
+    if ($ok) {
         // $sqlInsert = "INSERT INTO cosovatchat (TenCSVC, TinhTrang, GiaThue, GioMoCua, GioDongCua, TenCN, MaNVQL) 
         //              VALUES ('$TenCSVC', '$TinhTrang', '$GiaThue', '$GioMoCua', '$GioDongCua', '$TenCN', '$MaNVQL')";
         $sqlUpdate = "UPDATE cosovatchat 
@@ -30,6 +66,10 @@ if (isset($_POST['update'])) {
         header("location: index.php");
     }
 }
+$sqlShowTenCumNha = "SELECT * FROM cumnha";
+$cumnha = $conn->query($sqlShowTenCumNha);
+$sqlShowTruongCumNha = "SELECT * FROM truongcumnha";
+$truongcumnha = $conn->query($sqlShowTruongCumNha);
 ?>
 
 
@@ -69,11 +109,27 @@ if (isset($_POST['update'])) {
                             </div>
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="TenCN">Tên cụm nhà</span>
-                                <input type="text" class="form-control" placeholder="Tên cụm nhà" name="TenCN" value="<?= $cosovatchat['TenCN'] ?>">
+                                <!-- <input type="text" class="form-control" placeholder="Tên cụm nhà" name="TenCN" aria-describedby="TenCN"> -->
+                                <select class="form-select" placeholder="Tên cụm nhà" name="TenCN" aria-describedby="TenCN">
+                                    <option></option>
+                                    <?php
+                                    while ($row = $cumnha->fetch_assoc()) {
+                                    ?>
+                                        <option><?= $row['TenCN'] ?></option>
+                                    <?php
+                                    } ?>
+                                </select>
+
                             </div>
-                            <div class="form-floating">
-                                <input class="form-control my-3" placeholder="Nhập Tình Trạng" id="TinhTrang" name="TinhTrang" value="<?= $cosovatchat['TinhTrang'] ?>"></input>
-                                <label for="TinhTrang">Tình Trạng</label>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="TinhTrang">Tình Trạng</span>
+                                <!-- <input type="text" class="form-control" placeholder="Tên cụm nhà" name="TenCN" aria-describedby="TenCN"> -->
+                                <select class="form-select" placeholder="Tình Trạng" name="TinhTrang" aria-describedby="TinhTrang">
+                                    <option></option>
+                                    <option>đang hoạt động</option>
+                                    <option>ngừng hoạt động</option>
+                                </select>
+
                             </div>
                             <div class="input-group mb-3">
                                 <span class="input-group-text">Giá thuê</span>
@@ -82,13 +138,26 @@ if (isset($_POST['update'])) {
                             </div>
                             <div class="input-group mb-3">
                                 <span class="input-group-text">Giờ mở cửa</span>
-                                <input type="text" class="form-control" placeholder="Eg: 6:00:00" name="GioMoCua" value="<?= $cosovatchat['GioMoCua'] ?>">
+                                <!-- <input type="text" class="form-control" placeholder="Eg: 6:00:00" name="gioMoCua"> -->
+                                <input type="time" class="form-control" placeholder="Eg: 6:00" name="GioMoCua">
+
                                 <span class="input-group-text">Giờ đóng cửa</span>
-                                <input type="text" class="form-control" placeholder="Eg: 20:00:00" name="GioDongCua" value="<?= $cosovatchat['GioDongCua'] ?>">
+                                <!-- <input type="text" class="form-control" placeholder="Eg: 20:00:00" name="gioDongCua"> -->
+                                <input type="time" class="form-control" placeholder="Eg: 22:00" name="GioDongCua">
+
                             </div>
-                            <div class="form-floating">
-                                <input class="form-control my-3" placeholder="Nhập Tình Trạng" id="MaNVQL" name="MaNVQL" value="<?= $cosovatchat['MaNVQL'] ?>"></input>
-                                <label for="MaNVQL">Mã số nhân viên</label>
+                            <div class="input-group mb-3">
+                                <!-- <input class="form-control my-3" placeholder="Nhập Tình Trạng" id="MaNVQL" name="MaNVQL"></input> -->
+                                <span class="input-group-text" id="MaNVQL">Mã nhân viên quản lí</span>
+                                <select class="form-select" placeholder="Nhập Tình Trạng" id="MaNVQL" name="MaNVQL">
+                                    <option></option>
+                                    <?php
+                                    while ($row = $truongcumnha->fetch_assoc()) {
+                                    ?>
+                                        <option><?= $row['MaNV'] ?></option>
+                                    <?php
+                                    } ?>
+                                </select>
                             </div>
                             <div class="d-flex justify-content-evenly mt-3">
                                 <a href="index.php" class="btn btn-secondary">Hủy bỏ</a>
@@ -100,6 +169,13 @@ if (isset($_POST['update'])) {
             </div>
         </div>
     </div>
+    <script>
+        const pickerInline = document.querySelector('.timepicker-inline-24');
+        const timepickerMaxMin = new mdb.Timepicker(pickerInline, {
+            format24: true,
+            inline: true
+        });
+    </script>
 </body>
 
 </html>
