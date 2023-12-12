@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Dec 12, 2023 at 09:34 AM
+-- Generation Time: Dec 12, 2023 at 07:05 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -11,7 +11,8 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-
+create database asm2;
+use asm2;
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -30,6 +31,53 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `del_CSVC` (IN `TenCSVC` VARCHAR(255
          then UPDATE cosovatchat SET TinhTrang = 'ngừng hoạt động' WHERE cosovatchat.TenCSVC = TenCSVC;
          else DELETE FROM cosovatchat WHERE cosovatchat.TenCSVC=TenCSVC;
          end if;
+       END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `doanhthu_CSVC` (`TenCSVC` VARCHAR(255), `nam` YEAR)   BEGIN
+       drop table if exists hoadonraw;
+       drop table if exists temp1;
+       drop table if exists dathanhtoan;
+       drop table if exists chuathanhtoan;
+       drop table if exists doanhthu;
+       drop table if exists thang;
+       drop table if exists temp3;
+       drop table if exists temp4;
+       create temporary	table hoadonraw(ThoiGianBatDauSD timestamp, TrangThaiThanhToan varchar(50), ThanhTien int);
+       insert into hoadonraw select hoadon.ThoiGianBatDauSD, hoadon.TrangThaiThanhToan, hoadon.ThanhTien
+							 from hoadon, hoadoncsvc
+							 where hoadon.MaHD=hoadoncsvc.MaHD AND hoadoncsvc.TenCSVC=TenCSVC AND year(hoadon.ThoiGianBatDauSD)=nam;
+	    create temporary table temp1 (thang int, TrangThaiThanhToan varchar(50), ThanhTien int);
+        insert into temp1 select month(ThoiGianBatDauSD), TrangThaiThanhToan, sum(ThanhTien)
+ 						 from hoadonraw
+ 						 group by month(ThoiGianBatDauSD), TrangThaiThanhToan;
+		create temporary table thang(thang int);
+        insert into thang value (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12);
+								
+	    create temporary table dathanhtoan (thang int, DaThanhToan int);
+        insert into dathanhtoan select thang, ThanhTien
+ 							   from temp1
+ 							   where TrangThaiThanhToan='đã thanh toán';
+
+	    create temporary table chuathanhtoan (thang int, ChuaThanhToan int);
+        insert into chuathanhtoan select thang, ThanhTien
+ 							   from temp1
+ 							   where TrangThaiThanhToan='chưa thanh toán';
+ 	    create temporary table doanhthu (thang int, DoanhThu int);
+        insert into doanhthu select thang, sum(ThanhTien)
+ 							from temp1
+ 							group by thang;
+		create temporary table temp3 (thang int, DoanhThu int);
+        insert into temp3 select thang.thang, ifnull(doanhthu.DoanhThu, 0) as DoanhThu
+						  from thang left join doanhthu on thang.thang=doanhthu.thang
+						  group by thang.thang;
+		create temporary table temp4 (thang int, DoanhThu int, DaThanhToan int);
+        insert into temp4 select temp3.thang, DoanhThu, ifnull(dathanhtoan.DaThanhToan, 0) as DaThanhToan
+						  from temp3 left join dathanhtoan on temp3.thang=dathanhtoan.thang
+						  group by temp3.thang;
+		select temp4.thang, DoanhThu,  DaThanhToan, ifnull(chuathanhtoan.ChuaThanhToan, 0) as ChuaThanhToan
+ 		from temp4 left join chuathanhtoan on temp4.thang=chuathanhtoan.thang
+ 		group by temp4.thang;
+		
        END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `hoadonconno` (`MSSV` VARCHAR(7))   BEGIN
@@ -75,9 +123,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `hoadonconno` (`MSSV` VARCHAR(7))   
              select * from temp4;
        END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `hoadon_CSVC` (`TenCSVC` VARCHAR(255), `ngaybatdau` DATE, `ngayketthuc` DATE)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `hoadon_CSVC` (IN `TenCSVC` VARCHAR(255), IN `ngaybatdau` DATE, IN `ngayketthuc` DATE)   BEGIN
 		select hoadon.MaHD, hoadon.NgayTaoHoaDon, hoadon.ThoiGianBatDauSD, hoadon.ThoiGianNgungSD, 
-               hoadoncsvc.SoGioThue,hoadon.HanThanhToan, hoadon.TrangThaiThanhToan, hoadon.ThanhTien, 
+              TIMESTAMPDIFF(HOUR, hoadon.ThoiGianBatDauSD, hoadon.ThoiGianNgungSD) AS SoGioThue, hoadon.HanThanhToan, hoadon.TrangThaiThanhToan, (TIMESTAMPDIFF(HOUR, hoadon.ThoiGianBatDauSD, hoadon.ThoiGianNgungSD)*cosovatchat.GiaThue) as ThanhTien, 
                cosovatchat.TenCSVC,cosovatchat.TenCN, cosovatchat.GiaThue, phieudangkycsvc.MaPDK, phieudangky.TenTaiKhoan
         from hoadon, hoadoncsvc, phieudangky, phieudangkycsvc, cosovatchat
         where hoadon.MaHD=hoadoncsvc.MaHD AND hoadoncsvc.MaPDK=phieudangkycsvc.MaPDK 
@@ -86,9 +134,12 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `hoadon_CSVC` (`TenCSVC` VARCHAR(255
               AND phieudangkycsvc.TenCSVC=TenCSVC;
        END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_CSVC` (`TenCSVC` VARCHAR(255), `GiaThue` INT(11), `GioMoCua` TIME, `GioDongCua` TIME, `TenCN` VARCHAR(20), `TinhTrang` VARCHAR(50), `MaNVQL` VARCHAR(10))   
-BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_CSVC` (`TenCSVC` VARCHAR(255), `GiaThue` INT(11), `GioMoCua` TIME, `GioDongCua` TIME, `TenCN` VARCHAR(20), `TinhTrang` VARCHAR(50), `MaNVQL` VARCHAR(10))   BEGIN
 		 SET FOREIGN_KEY_CHECKS=0;
+         if exists (select * from cosovatchat where TenCSVC=cosovatchat.TenCSVC) then
+			 SIGNAL SQLSTATE "45000"
+	         SET MESSAGE_TEXT = 'Tên cơ sở vật chất đã tồn tại !', MYSQL_ERRNO = 1001;
+		 end if;
          INSERT INTO cosovatchat (TenCSVC, TinhTrang, GiaThue, GioMoCua, GioDongCua, TenCN, MaNVQL)
 		 VALUES (TenCSVC,TinhTrang, GiaThue,GioMoCua,GioDongCua,TenCN,MaNVQL);
          SET FOREIGN_KEY_CHECKS=1;
@@ -224,6 +275,7 @@ CREATE TABLE `cosovatchat` (
 
 INSERT INTO `cosovatchat` (`TenCSVC`, `GiaThue`, `GioMoCua`, `GioDongCua`, `TenCN`, `TinhTrang`, `MaNVQL`) VALUES
 ('Internet', 10000, '06:00:00', '21:30:00', 'A', 'ngừng hoạt động', 'TCN0011'),
+('ksor', 10000, '09:59:00', '19:59:00', 'AB', 'đang hoạt động', 'TCN0016'),
 ('Phòng giặt', 10000, '06:00:00', '20:00:00', 'C', 'đang hoạt động', 'TCN0016'),
 ('Phòng sấy', 5000, '06:00:00', '20:00:00', 'F', 'đang hoạt động', 'TCN0019'),
 ('Phòng tập aerobic', 10000, '06:00:00', '20:00:00', 'E', 'đang hoạt động', 'TCN0018'),
@@ -322,8 +374,8 @@ CREATE TABLE `cumnha` (
 --
 
 INSERT INTO `cumnha` (`TenCN`, `SoToa`, `SucChua`, `SoLuongCSVC`) VALUES
-('A', 18, 10000, 10),
-('AB', 5, 4500, 2),
+('A', 18, 10000, 2),
+('AB', 5, 4500, 3),
 ('AG', 2, 1650, 4),
 ('AH', 2, 2600, 3),
 ('B', 5, 4500, 2),
@@ -344,8 +396,8 @@ CREATE TABLE `hoadon` (
   `NgayTaoHoaDon` date NOT NULL,
   `LoaiDV` varchar(50) NOT NULL,
   `NgayDangKy` date NOT NULL,
-  `ThoiGianBatDauSD` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `ThoiGianNgungSD` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `ThoiGianBatDauSD` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `ThoiGianNgungSD` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `HanThanhToan` date NOT NULL,
   `TrangThaiThanhToan` varchar(50) NOT NULL,
   `ThanhTien` int(11) NOT NULL
@@ -356,9 +408,9 @@ CREATE TABLE `hoadon` (
 --
 
 INSERT INTO `hoadon` (`MaHD`, `NgayTaoHoaDon`, `LoaiDV`, `NgayDangKy`, `ThoiGianBatDauSD`, `ThoiGianNgungSD`, `HanThanhToan`, `TrangThaiThanhToan`, `ThanhTien`) VALUES
-('HDCSVC001', '2023-01-01', 'Sân bóng đá', '2023-01-01', '2023-12-11 07:39:30', '2023-12-11 07:39:30', '2023-01-15', 'Đã thanh toán', 10000),
+('HDCSVC001', '2023-01-01', 'Sân bóng đá', '2023-01-01', '2023-12-12 17:53:04', '2023-12-11 09:39:30', '2023-01-15', 'Đã thanh toán', 10000),
 ('HDCSVC002', '2023-01-02', 'Phòng tập gym', '2023-02-01', '2023-12-11 07:39:36', '2023-12-11 07:39:36', '2023-02-15', 'Chưa thanh toán', 10000),
-('HDCSVC003', '2023-01-03', 'Internet', '2023-03-01', '2023-12-11 07:39:42', '2023-12-11 07:39:42', '2023-03-15', 'Đã thanh toán', 10000),
+('HDCSVC003', '2023-01-03', 'Internet', '2023-03-01', '2023-12-12 17:56:41', '2023-12-13 09:39:42', '2023-03-15', 'Đã thanh toán', 10000),
 ('HDCSVC004', '2023-01-04', 'Sân bóng chuyền', '2023-04-01', '2023-12-11 07:39:47', '2023-12-11 07:39:47', '2023-04-15', 'Chưa thanh toán', 10000),
 ('HDCSVC005', '2023-01-05', 'Phòng tập yoga', '2023-05-01', '2023-12-11 07:39:52', '2023-12-11 07:39:52', '2023-05-15', 'Đã thanh toán', 10000),
 ('HDCSVC006', '2023-01-06', 'Phòng giặt', '2023-06-01', '2023-12-11 07:39:56', '2023-12-11 07:39:56', '2023-06-15', 'Chưa thanh toán', 8000),
@@ -366,16 +418,16 @@ INSERT INTO `hoadon` (`MaHD`, `NgayTaoHoaDon`, `LoaiDV`, `NgayDangKy`, `ThoiGian
 ('HDCSVC008', '2023-01-08', 'Phòng tập aerobic', '2023-08-01', '2023-12-11 07:40:09', '2023-12-11 07:40:09', '2023-08-15', 'Chưa thanh toán', 8000),
 ('HDCSVC009', '2023-01-09', 'Phòng sấy', '2023-09-01', '2023-12-11 07:40:18', '2023-12-11 07:40:18', '2023-09-15', 'Đã thanh toán', 8000),
 ('HDCSVC010', '2023-01-10', 'Sân cầu lông', '2023-10-01', '2023-12-11 07:40:24', '2023-12-11 07:40:24', '2023-10-15', 'Chưa thanh toán', 8000),
-('HDCSVC011', '2023-12-01', 'Internet', '2023-12-01', '2023-11-30 23:00:15', '2023-12-11 03:00:15', '2023-12-09', 'chưa thanh toán', 130000),
-('HDCSVC012', '2023-11-01', 'Internet', '2023-12-01', '2023-10-31 23:00:15', '2023-11-11 03:00:15', '2023-12-09', 'chưa thanh toán', 130000),
-('HDCSVC013', '2023-12-01', 'Internet', '2023-10-01', '2023-09-30 23:00:15', '2023-10-11 03:00:15', '2023-10-09', 'đã thanh toán', 130000),
-('HDCSVC014', '2023-11-01', 'Internet', '2023-09-01', '2023-08-31 23:00:15', '2023-09-11 03:00:15', '2023-09-09', 'đã thanh toán', 130000),
-('HDCSVC015', '2023-08-01', 'Internet', '2023-08-01', '2023-07-31 23:00:15', '2023-08-11 03:00:15', '2023-08-09', 'đã thanh toán', 130000),
-('HDCSVC016', '2023-07-01', 'Internet', '2023-07-01', '2023-06-30 23:00:15', '2023-07-11 03:00:15', '2023-07-09', 'chưa thanh toán', 130000),
-('HDCSVC017', '2023-06-01', 'Internet', '2023-06-01', '2023-05-31 23:00:15', '2023-06-11 03:00:15', '2023-06-09', 'đã thanh toán', 130000),
-('HDCSVC018', '2023-05-01', 'Internet', '2023-05-01', '2023-04-30 23:00:15', '2023-05-11 03:00:15', '2023-05-09', 'đã thanh toán', 130000),
-('HDCSVC019', '2023-04-01', 'Internet', '2023-04-01', '2023-03-31 23:00:15', '2023-04-11 03:00:15', '2023-04-09', 'đã thanh toán', 130000),
-('HDCSVC020', '2023-03-01', 'Internet', '2023-03-01', '2023-02-28 23:00:15', '2023-03-11 03:00:15', '2023-03-09', 'đã thanh toán', 130000),
+('HDCSVC011', '2023-12-01', 'Internet', '2023-12-01', '2023-12-12 18:00:35', '2023-12-12 17:53:31', '2023-12-09', 'chưa thanh toán', 130000),
+('HDCSVC012', '2023-11-01', 'Internet', '2023-12-01', '2023-12-12 18:00:45', '2023-12-12 17:53:35', '2023-12-09', 'chưa thanh toán', 130000),
+('HDCSVC013', '2023-12-01', 'Internet', '2023-10-01', '2023-10-10 17:57:45', '2023-12-12 18:01:50', '2023-10-09', 'đã thanh toán', 130000),
+('HDCSVC014', '2023-11-01', 'Internet', '2023-09-01', '2023-09-10 17:57:53', '2023-12-12 18:01:57', '2023-09-09', 'đã thanh toán', 130000),
+('HDCSVC015', '2023-08-01', 'Internet', '2023-08-01', '2023-08-10 17:58:01', '2023-12-12 18:02:12', '2023-08-09', 'đã thanh toán', 130000),
+('HDCSVC016', '2023-07-01', 'Internet', '2023-07-01', '2023-07-10 17:58:11', '2023-12-12 18:02:19', '2023-07-09', 'chưa thanh toán', 130000),
+('HDCSVC017', '2023-06-01', 'Internet', '2023-06-01', '2023-06-10 17:58:17', '2023-12-12 18:02:26', '2023-06-09', 'đã thanh toán', 130000),
+('HDCSVC018', '2023-05-01', 'Internet', '2023-05-01', '2023-05-10 17:58:23', '2023-12-12 18:02:34', '2023-05-09', 'đã thanh toán', 130000),
+('HDCSVC019', '2023-04-01', 'Internet', '2023-04-01', '2023-03-31 17:58:31', '2023-12-12 18:02:42', '2023-04-09', 'đã thanh toán', 130000),
+('HDCSVC020', '2023-03-01', 'Internet', '2023-03-01', '2023-03-10 17:58:38', '2023-12-12 18:02:48', '2023-03-09', 'đã thanh toán', 130000),
 ('HDDN001', '2023-01-01', 'Internet', '2023-11-01', '2023-12-11 07:40:31', '2023-12-11 07:40:31', '2023-11-15', 'Đã thanh toán', 10000),
 ('HDDN002', '2023-01-02', 'Cable TV', '2023-12-01', '2023-12-11 07:40:35', '2023-12-11 07:40:35', '2023-12-15', 'Chưa thanh toán', 10000),
 ('HDDN003', '2023-01-03', 'Phone', '2021-01-01', '2023-12-11 07:40:49', '2023-12-11 07:40:49', '2021-01-12', 'Đã thanh toán', 10000),
@@ -445,11 +497,11 @@ INSERT INTO `hoadoncsvc` (`MaHD`, `TenCSVC`, `SoGioThue`, `MaPDK`) VALUES
 ('HDCSVC008', 'Phòng tập aerobic', 4, 'PV008'),
 ('HDCSVC009', 'Phòng sấy', 6, 'PV009'),
 ('HDCSVC010', 'Sân cầu lông', 3, 'PV010'),
-('HDCSVC011', 'Internet', 2, 'PV001'),
-('HDCSVC012', 'Internet', 2, 'PV001'),
-('HDCSVC013', 'Internet', 2, 'PV001'),
-('HDCSVC014', 'Internet', 2, 'PV001'),
-('HDCSVC015', 'Internet', 2, 'PV002'),
+('HDCSVC011', 'Internet', 2, 'PV003'),
+('HDCSVC012', 'Internet', 2, 'PV003'),
+('HDCSVC013', 'Internet', 2, 'PV003'),
+('HDCSVC014', 'Internet', 2, 'PV003'),
+('HDCSVC015', 'Internet', 2, 'PV003'),
 ('HDCSVC016', 'Internet', 2, 'PV003'),
 ('HDCSVC017', 'Internet', 2, 'PV003'),
 ('HDCSVC018', 'Internet', 2, 'PV003'),
@@ -481,15 +533,15 @@ CREATE TABLE `hoadondiennuoc` (
 
 INSERT INTO `hoadondiennuoc` (`MaHD`, `ChiSoDienDau`, `ChiSoDienCuoi`, `Gia1ChiSoDien`, `ChiSoNuocDau`, `ChiSoNuocCuoi`, `Gia1ChiSoNuoc`, `NgayChotChi`, `TenTaiKhoan`, `ThangThanhToan`) VALUES
 ('HDDN001', 1000, 1200, 3000, 50, 70, 2000, '2023-11-15', 'user01', 2023),
-('HDDN002', 800, 950, 3000, 40, 55, 2000, '2023-11-15', 'user02', 2023),
-('HDDN003', 1200, 1400, 3000, 60, 80, 2000, '2023-11-15', 'user03', 2023),
-('HDDN004', 1100, 1300, 3000, 55, 75, 2000, '2023-11-15', 'user04', 2023),
-('HDDN005', 950, 1100, 3000, 45, 60, 2000, '2023-11-15', 'user05', 2023),
-('HDDN006', 1050, 1250, 3000, 55, 70, 2000, '2023-11-15', 'user06', 2023),
-('HDDN007', 900, 1050, 3000, 42, 58, 2000, '2023-11-15', 'user07', 2023),
-('HDDN008', 1000, 1150, 3000, 48, 65, 2000, '2023-11-15', 'user08', 2023),
-('HDDN009', 1150, 1350, 3000, 58, 78, 2000, '2023-11-15', 'user09', 2023),
-('HDDN010', 950, 1120, 3000, 43, 62, 2000, '2023-11-15', 'user10', 2023);
+('HDDN002', 800, 950, 3000, 40, 55, 2000, '2023-11-15', 'user02', 2),
+('HDDN003', 1200, 1400, 3000, 60, 80, 2000, '2023-11-15', 'user03', 3),
+('HDDN004', 1100, 1300, 3000, 55, 75, 2000, '2023-11-15', 'user04', 4),
+('HDDN005', 950, 1100, 3000, 45, 60, 2000, '2023-11-15', 'user05', 5),
+('HDDN006', 1050, 1250, 3000, 55, 70, 2000, '2023-11-15', 'user06', 6),
+('HDDN007', 900, 1050, 3000, 42, 58, 2000, '2023-11-15', 'user07', 7),
+('HDDN008', 1000, 1150, 3000, 48, 65, 2000, '2023-11-15', 'user08', 8),
+('HDDN009', 1150, 1350, 3000, 58, 78, 2000, '2023-11-15', 'user09', 9),
+('HDDN010', 950, 1120, 3000, 43, 62, 2000, '2023-11-15', 'user10', 10);
 
 -- --------------------------------------------------------
 
@@ -1021,6 +1073,28 @@ INSERT INTO `phieudangkycsvc` (`MaPDK`, `TenCSVC`) VALUES
 ('PV001', 'Sân bóng đá'),
 ('PV010', 'Sân cầu lông');
 
+--
+-- Triggers `phieudangkycsvc`
+--
+DELIMITER $$
+CREATE TRIGGER `tr_tao_hoadon_csvc` AFTER INSERT ON `phieudangkycsvc` FOR EACH ROW BEGIN
+    DECLARE han_thanh_toan DATE;
+    SET han_thanh_toan = DATE_ADD(NOW(), INTERVAL 1 WEEK);
+
+    -- Tạo hóa đơn và lấy ID
+    INSERT INTO hoadon (NgayTaoHoaDon, HanThanhToan)
+    VALUES (NOW(), han_thanh_toan);
+    SET @MaHD = LAST_INSERT_ID();
+
+    -- Lấy thông tin từ phiếu đăng ký và thêm vào hóa đơn
+    INSERT INTO hoadoncsvc (MaHD, TenCSVC)
+    SELECT @MaHD, TenCSVC
+    FROM phieudangkycsvc
+    WHERE MaPDK = NEW.MaPDK; -- MaPDK là khóa chính của bảng phieudangkycsvc
+END
+$$
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -1159,35 +1233,35 @@ CREATE TABLE `sinhvien` (
 --
 
 INSERT INTO `sinhvien` (`CCCD`, `MSSV`, `HoVaTen`, `NgaySinh`, `GioiTinh`, `Truong`, `Khoa`, `SinhVienNam`, `MaBHYT`, `HoKhau`, `TenTN`, `SoPhong`, `TP_CCCD`) VALUES
-('001301025380', '1952017', 'Văn Kim Ngân', '2001-04-26', 'Nữ', 'ĐH Công nghệ Thông tin, ĐHQG TP.HCM', 'Khoa học & KTTT', 3, 'SV4798223550190', '233, ấp Phong Thuận, Xã Tân Mỹ Chánh, Thành phố Mỹ', 'AG3', 1001, 'Hà Nội'),
-('035201001228', '1911012', 'Nguyễn Gia Đức', '2001-03-03', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Điện - Điện tử', 3, 'SV4797424687290', '19/5 bình chuẩn 34, Phường Bình Chuẩn, THÀNH PHỐ T', 'AH1', 201, 'Hà Nam'),
-('042202001511', '2115321', 'Lê Phan Quốc Vũ', '2002-04-11', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 1, 'SV4794217106049', 'Xóm 5 Đông Dũng , xã An Dũng, huyện Đức Thọ, tĩnh ', 'AH1', 204, 'Hà Tĩnh'),
-('042303012902', '2114154', 'Nguyễn Thị Mai Ngân', '2003-05-28', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Quản lý Công nghiệp', 1, 'SV4794217701411', 'Thôn Cẩm Đông, Xã Cẩm Hà, Huyện Cẩm Xuyên, Hà Tĩnh', 'AG3', 1002, 'Hà Tĩnh'),
-('075302017041', '2012175', 'Thái Ngọc Minh Thư', '2002-08-07', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Cơ khí', 2, 'SV4797524715078', '̣96c/3 Ấp Lộc Hòa, Xã Tây Hoà, Huyện Trảng Bom, Đồ', 'AG3', 1004, 'Đồng Nai'),
-('079302023716', 'BABAIU2', 'Trần Nguyệt Vi', '2002-08-08', 'Nữ', 'ĐH Quốc tế, ĐHQG TP.HCM', 'Quản trị kinh doanh', 2, 'SV4797931970194', '26/11 Nguyễn Văn Đậu, Phường 05, Quận Phú Nhuận, H', 'AG3', 1002, 'Hồ Chí Minh'),
-('082303003975', '2111028', 'Võ Thị Hồng Gấm', '2003-09-29', 'Nữ', 'ĐH Khoa học Tự nhiên, ĐHQG TP.HCM', 'Toán - Tin học', 1, 'HS4828221997845', 'Ấp 5, Xã Bình Xuân, Thị xã Gò Công, Tiền Giang', 'AG3', 1003, 'Tiền Giang'),
-('082303004279', '2120032', 'Võ Thị Hồng Nhung', '2003-09-29', 'Nữ', 'ĐH Khoa học Tự nhiên, ĐHQG TP.HCM', 'Điện tử viễn thông', 1, 'HS4828221953114', 'Ấp 5, Xã Bình Xuân, Thị xã Gò Công, Tiền Giang', 'AG3', 1003, 'Tiền Giang'),
-('087303011214', '2110608', 'Trần Lê Bảo Trân', '2003-01-25', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học Ứng dụng', 1, 'HS4878723535469', 'C136, tổ 48D, khóm 5, Phường 6, Thành phố Cao Lãnh', 'AG3', 1004, 'Đồng Tháp'),
-('089202013750', '2011844', 'Lâm Phạm Trọng Phúc', '2002-09-02', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 2, 'SV4798923334566', '278, tổ 6, ấp Bình Thiện, Xã Bình Thủy, Huyện Châu', 'AH1', 202, 'An Giang'),
-('191920528', '2014276', 'Nguyễn Tôn Minh Quân', '2002-01-07', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 2, 'SV4794620100949', '4/10 Võ Thị Sáu, Phường Phú Hội, Thành phố Huế, Th', 'AH1', 203, 'Thừa Thiên H'),
-('191920634', '2014961', 'Vũ Hoàng Minh Tuấn', '2002-08-08', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 2, 'SV4794620071003', '50 Nguyễn Cư Trinh, Phường Thuận Hòa, Thành phố Hu', 'AH1', 203, 'Thừa Thiên H'),
-('191920860', '2014726', 'Nguyễn Phước Bảo Tiến', '2002-03-20', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 2, 'SV4794621337543', '164 Điện Biên Phủ, Phường Trường An, Thành phố Huế', 'AH1', 203, 'Thừa Thiên H'),
-('191921740', '2013391', 'Nguyễn Khánh Hưng', '2002-06-13', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 2, 'SV4794620288682', '20/11 Quảng Tế, Phường Trường An, Thành phố Huế, T', 'AH1', 203, 'Thừa Thiên H'),
-('191973789', '2014512', 'Trương Công Thành', '2002-11-02', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 2, 'SV4794620401932', '55 Hiền Sỹ, Thị trấn Phong Điền, Huyện Phong Điền,', 'AH1', 203, 'Thừa Thiên H'),
-('212468924', '2013444', 'Nguyễn Lê Khanh', '2002-01-04', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 2, 'SV4795120846722', 'đội 7, thôn Phú Châu, Xã Hành Đức, Huyện Nghĩa Hàn', 'AH1', 203, 'Quảng Ngãi'),
-('215593028', '2113176', 'Lê Nguyễn Hải Đăng', '2003-08-14', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 1, 'HS4525221145653', '332 Ngô Gia Tự,phường Bình Định,thị xã An Nhơn,tỉn', 'AH1', 204, 'Bình Định'),
-('215613202', '2115319', 'Lê Hoàng Anh Vũ', '2003-03-01', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 1, 'SV4795221655121', '1247 Trần Hưng Đạo, Tổ 2, Khu vực 1, Phường Đống Đ', 'AH1', 204, 'Bình Định'),
-('231441838', '2014764', 'Nguyễn Thanh Tịnh', '2002-08-14', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Kỹ thuật Xây dựng', 2, 'SV4796422675255', 'thôn Hòa Tín, đường Quy Hoạch, Thị trấn Nhơn Hoà, ', 'AH1', 202, 'Gia Lai'),
-('272909687', '2011720', 'Lưu Thị Minh Nguyệt', '2002-01-07', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Kỹ thuật Hóa học', 2, 'SV4797523610166', '207 đường Nguyễn Phúc Chu, Phường Trảng Dài, Thành', 'AG3', 1002, 'Đồng Nai'),
-('276041233', '2011534', 'Phạm Thị Mỹ Linh', '2002-06-11', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Kỹ thuật Địa chất và Dầu khí', 2, 'SV4757523029998', 'Khu phố 2 , Phường Trảng Dài, Thành phố Biên Hòa, ', 'AG3', 1002, 'Đồng Nai'),
-('301640421', '1715403', 'Võ Thị Linh Vy', '1998-01-01', 'Nữ', 'ĐH Khoa học Tự nhiên, ĐHQG TP.HCM', 'Sinh học', 5, 'SV4798023238427', 'A3G/60 Ấp Vàm Kinh, Xã Bình An, Huyện Thủ Thừa, Lo', 'AG3', 1004, 'Long An'),
-('301776828', '2011886', 'Trần Thị Thúy Phượng', '2002-02-17', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Kỹ thuật Địa chất và Dầu khí', 2, 'SV4798023361087', '141, Xã Tân Phú, Huyện Đức Hòa, Long An', 'AG3', 1002, 'Long An'),
-('312507287', '2011726', 'Đặng Ngô Trung Nhân', '2002-10-05', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Quản lý Công nghiệp', 2, 'SV4798222329146', '313, Ấp lợi thuận, Xã Mỹ Lợi B, Huyện Cái Bè, Tiền', 'AH1', 202, 'Tiền Giang'),
-('312530418', '2114796', 'Võ Minh Thành', '2003-10-27', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Kỹ thuật Hóa học', 1, 'SV4798222766226', 'số nhà 44, ấp Thới, Xã Đông Hòa, Huyện Châu Thành,', 'AH1', 204, 'Tiền Giang'),
-('366408893', '2152240', 'Nguyễn Thị Nhàn', '2003-08-08', 'Nữ', 'ĐH Công nghệ Thông tin, ĐHQG TP.HCM', 'Khoa học & KTTT', 1, 'XD2949421943465', 'võ thành văn, Xã An Thạnh Nam, Huyện Cù Lao Dung, ', 'AG3', 1003, 'Sóc Trăng'),
-('371996187', '1910028', 'Trần Lan Anh', '2001-12-14', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Cơ khí', 3, 'SV4799122290326', 'Ấp Tân Điền, Xã Giục Tượng, Huyện Châu Thành, Kiên', 'AG3', 1001, 'Kiên Giang'),
-('372013285', '1913902', 'Hà Ngọc Phương Lam', '2001-07-16', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Quản lý Công nghiệp', 3, 'SV4799123387480', '185 Ngô Quyền, Phường Vĩnh Bảo, Thành phố Rạch Giá', 'AG3', 1001, 'Kiên Giang'),
-('381887215', '2011193', 'Phan Trung Hiếu', '2002-01-02', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Kỹ thuật Hóa học', 2, 'SV4799621925517', '162 Nguyễn Tất Thành, Khóm 1, Phường 8, Thành phố ', 'AH1', 202, 'Cà Mau');
+('001301025380', '1952017', 'Văn Kim Ngân', '2001-04-26', 'Nữ', 'ĐH Công nghệ Thông tin, ĐHQG TP.HCM', 'Khoa học & KTTT', 3, 'SV4798223550190', '233, ấp Phong Thuận, Xã Tân Mỹ Chánh, Thành phố Mỹ', 'AG3', 1001, '001301025380'),
+('035201001228', '1911012', 'Nguyễn Gia Đức', '2001-03-03', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Điện - Điện tử', 3, 'SV4797424687290', '19/5 bình chuẩn 34, Phường Bình Chuẩn, THÀNH PHỐ T', 'AH1', 201, '042202001511'),
+('042202001511', '2115321', 'Lê Phan Quốc Vũ', '2002-04-11', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 1, 'SV4794217106049', 'Xóm 5 Đông Dũng , xã An Dũng, huyện Đức Thọ, tĩnh ', 'AH1', 204, '372013285'),
+('042303012902', '2114154', 'Nguyễn Thị Mai Ngân', '2003-05-28', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Quản lý Công nghiệp', 1, 'SV4794217701411', 'Thôn Cẩm Đông, Xã Cẩm Hà, Huyện Cẩm Xuyên, Hà Tĩnh', 'AG3', 1002, '001301025380'),
+('075302017041', '2012175', 'Thái Ngọc Minh Thư', '2002-08-07', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Cơ khí', 2, 'SV4797524715078', '̣96c/3 Ấp Lộc Hòa, Xã Tây Hoà, Huyện Trảng Bom, Đồ', 'AG3', 1004, '042202001511'),
+('079302023716', 'BABAIU2', 'Trần Nguyệt Vi', '2002-08-08', 'Nữ', 'ĐH Quốc tế, ĐHQG TP.HCM', 'Quản trị kinh doanh', 2, 'SV4797931970194', '26/11 Nguyễn Văn Đậu, Phường 05, Quận Phú Nhuận, H', 'AG3', 1002, '372013285'),
+('082303003975', '2111028', 'Võ Thị Hồng Gấm', '2003-09-29', 'Nữ', 'ĐH Khoa học Tự nhiên, ĐHQG TP.HCM', 'Toán - Tin học', 1, 'HS4828221997845', 'Ấp 5, Xã Bình Xuân, Thị xã Gò Công, Tiền Giang', 'AG3', 1003, '001301025380'),
+('082303004279', '2120032', 'Võ Thị Hồng Nhung', '2003-09-29', 'Nữ', 'ĐH Khoa học Tự nhiên, ĐHQG TP.HCM', 'Điện tử viễn thông', 1, 'HS4828221953114', 'Ấp 5, Xã Bình Xuân, Thị xã Gò Công, Tiền Giang', 'AG3', 1003, '042202001511'),
+('087303011214', '2110608', 'Trần Lê Bảo Trân', '2003-01-25', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học Ứng dụng', 1, 'HS4878723535469', 'C136, tổ 48D, khóm 5, Phường 6, Thành phố Cao Lãnh', 'AG3', 1004, '372013285'),
+('089202013750', '2011844', 'Lâm Phạm Trọng Phúc', '2002-09-02', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 2, 'SV4798923334566', '278, tổ 6, ấp Bình Thiện, Xã Bình Thủy, Huyện Châu', 'AH1', 202, '001301025380'),
+('191920528', '2014276', 'Nguyễn Tôn Minh Quân', '2002-01-07', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 2, 'SV4794620100949', '4/10 Võ Thị Sáu, Phường Phú Hội, Thành phố Huế, Th', 'AH1', 203, '042202001511'),
+('191920634', '2014961', 'Vũ Hoàng Minh Tuấn', '2002-08-08', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 2, 'SV4794620071003', '50 Nguyễn Cư Trinh, Phường Thuận Hòa, Thành phố Hu', 'AH1', 203, '372013285'),
+('191920860', '2014726', 'Nguyễn Phước Bảo Tiến', '2002-03-20', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 2, 'SV4794621337543', '164 Điện Biên Phủ, Phường Trường An, Thành phố Huế', 'AH1', 203, '001301025380'),
+('191921740', '2013391', 'Nguyễn Khánh Hưng', '2002-06-13', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 2, 'SV4794620288682', '20/11 Quảng Tế, Phường Trường An, Thành phố Huế, T', 'AH1', 203, '042202001511'),
+('191973789', '2014512', 'Trương Công Thành', '2002-11-02', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 2, 'SV4794620401932', '55 Hiền Sỹ, Thị trấn Phong Điền, Huyện Phong Điền,', 'AH1', 203, '372013285'),
+('212468924', '2013444', 'Nguyễn Lê Khanh', '2002-01-04', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 2, 'SV4795120846722', 'đội 7, thôn Phú Châu, Xã Hành Đức, Huyện Nghĩa Hàn', 'AH1', 203, '001301025380'),
+('215593028', '2113176', 'Lê Nguyễn Hải Đăng', '2003-08-14', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 1, 'HS4525221145653', '332 Ngô Gia Tự,phường Bình Định,thị xã An Nhơn,tỉn', 'AH1', 204, '042202001511'),
+('215613202', '2115319', 'Lê Hoàng Anh Vũ', '2003-03-01', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Khoa học và Kỹ thuật Máy tính', 1, 'SV4795221655121', '1247 Trần Hưng Đạo, Tổ 2, Khu vực 1, Phường Đống Đ', 'AH1', 204, '372013285'),
+('231441838', '2014764', 'Nguyễn Thanh Tịnh', '2002-08-14', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Kỹ thuật Xây dựng', 2, 'SV4796422675255', 'thôn Hòa Tín, đường Quy Hoạch, Thị trấn Nhơn Hoà, ', 'AH1', 202, '001301025380'),
+('272909687', '2011720', 'Lưu Thị Minh Nguyệt', '2002-01-07', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Kỹ thuật Hóa học', 2, 'SV4797523610166', '207 đường Nguyễn Phúc Chu, Phường Trảng Dài, Thành', 'AG3', 1002, '372013285'),
+('276041233', '2011534', 'Phạm Thị Mỹ Linh', '2002-06-11', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Kỹ thuật Địa chất và Dầu khí', 2, 'SV4757523029998', 'Khu phố 2 , Phường Trảng Dài, Thành phố Biên Hòa, ', 'AG3', 1002, '042202001511'),
+('301640421', '1715403', 'Võ Thị Linh Vy', '1998-01-01', 'Nữ', 'ĐH Khoa học Tự nhiên, ĐHQG TP.HCM', 'Sinh học', 5, 'SV4798023238427', 'A3G/60 Ấp Vàm Kinh, Xã Bình An, Huyện Thủ Thừa, Lo', 'AG3', 1004, '001301025380'),
+('301776828', '2011886', 'Trần Thị Thúy Phượng', '2002-02-17', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Kỹ thuật Địa chất và Dầu khí', 2, 'SV4798023361087', '141, Xã Tân Phú, Huyện Đức Hòa, Long An', 'AG3', 1002, '372013285'),
+('312507287', '2011726', 'Đặng Ngô Trung Nhân', '2002-10-05', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Quản lý Công nghiệp', 2, 'SV4798222329146', '313, Ấp lợi thuận, Xã Mỹ Lợi B, Huyện Cái Bè, Tiền', 'AH1', 202, '042202001511'),
+('312530418', '2114796', 'Võ Minh Thành', '2003-10-27', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Kỹ thuật Hóa học', 1, 'SV4798222766226', 'số nhà 44, ấp Thới, Xã Đông Hòa, Huyện Châu Thành,', 'AH1', 204, '001301025380'),
+('366408893', '2152240', 'Nguyễn Thị Nhàn', '2003-08-08', 'Nữ', 'ĐH Công nghệ Thông tin, ĐHQG TP.HCM', 'Khoa học & KTTT', 1, 'XD2949421943465', 'võ thành văn, Xã An Thạnh Nam, Huyện Cù Lao Dung, ', 'AG3', 1003, '372013285'),
+('371996187', '1910028', 'Trần Lan Anh', '2001-12-14', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Cơ khí', 3, 'SV4799122290326', 'Ấp Tân Điền, Xã Giục Tượng, Huyện Châu Thành, Kiên', 'AG3', 1001, '042202001511'),
+('372013285', '1913902', 'Hà Ngọc Phương Lam', '2001-07-16', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Quản lý Công nghiệp', 3, 'SV4799123387480', '185 Ngô Quyền, Phường Vĩnh Bảo, Thành phố Rạch Giá', 'AG3', 1001, '001301025380'),
+('381887215', '2011193', 'Phan Trung Hiếu', '2002-01-02', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Kỹ thuật Hóa học', 2, 'SV4799621925517', '162 Nguyễn Tất Thành, Khóm 1, Phường 8, Thành phố ', 'AH1', 202, '372013285');
 
 --
 -- Triggers `sinhvien`
@@ -1332,7 +1406,7 @@ INSERT INTO `sodienthoaisv` (`CCCD`, `SoDienThoai`) VALUES
 ('312530418', '0968000682'),
 ('366408893', '0376483831'),
 ('371996187', '0855003159'),
-('372013285', '0855003159'),
+('372013285', ''),
 ('381887215', '0916211693');
 
 -- --------------------------------------------------------
