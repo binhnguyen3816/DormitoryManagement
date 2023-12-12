@@ -239,7 +239,7 @@ INSERT INTO `cosovatchat` (`TenCSVC`, `GiaThue`, `GioMoCua`, `GioDongCua`, `TenC
 --
 DELIMITER $$
 CREATE TRIGGER `tr5a_GioMoCua` BEFORE INSERT ON `cosovatchat` FOR EACH ROW BEGIN
-  IF NEW.GioMoCua <= ADDTIME(CURTIME(), '06:00:00') THEN
+  IF NEW.GioMoCua <=  '06:00:00' THEN
     SIGNAL SQLSTATE '45000'
     SET MESSAGE_TEXT = 'GioMoCua phải sau 6h sáng!';
   END IF;
@@ -248,7 +248,7 @@ $$
 DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `tr5b_GioDongCua` BEFORE INSERT ON `cosovatchat` FOR EACH ROW BEGIN
-  IF NEW.GioDongCua >= ADDTIME(CURTIME(), '22:00:00') THEN
+  IF NEW.GioDongCua >=  '22:00:00' THEN
     SIGNAL SQLSTATE '45000'
     SET MESSAGE_TEXT = 'GioDongCua phải trước 22h tối!';
   END IF;
