@@ -1,3 +1,24 @@
+<?php
+require_once '../db_connection.php';
+
+$sqlShowCSVC = "SELECT * FROM cosovatchat";
+$cosovatchat = $conn->query($sqlShowCSVC);
+$doanhthu = '';
+if (isset($_POST['show'])) {
+    $TenCSVC = $_POST['TenCSVC'];
+    $nam = $_POST['nam'];
+    
+    $tb = '';
+    $ok = true;
+    if ($ok) {
+        $sqlInsert = "call doanhthu_CSVC('$TenCSVC', '$nam')";
+        $doanhthu = $conn->query($sqlInsert);
+    }
+}
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,10 +28,10 @@
     <title>Doanh thu cơ sở vật chất</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-    body {
-        background-image: url("https://storage.googleapis.com/onthisinhvien.appspot.com/images/177923853-1602658848671-trung-tam-quan-ly-ky-tuc-xa-dhqg-hcm-4-15593818365402059953493(1).jpg");
-        background-size: cover;
-    }
+        body {
+            background-image: url("https://storage.googleapis.com/onthisinhvien.appspot.com/images/177923853-1602658848671-trung-tam-quan-ly-ky-tuc-xa-dhqg-hcm-4-15593818365402059953493(1).jpg");
+            background-size: cover;
+        }
     </style>
 </head>
 
@@ -25,31 +46,55 @@
                             <button id="backBtn" class="btn btn-primary p-3">Quay lại</button>
                         </div>
                     </div>
-                    <div id="inputForm" class="text-center mt-5">
-                        <div class="input-group mb-3">
+                    <form class="p-3" target="_self" id="inputForm" method="post">
+                        <!-- <div class="input-group mb-3">
                             <input type="text" id="maSinhVienInput" class="form-control"
                                 placeholder="Tên cơ sở vật chất">
+                        </div> -->
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="TenCSVC">Tên cơ sở vật chất</span>
+                            <!-- <input type="text" class="form-control" placeholder="Tên cụm nhà" name="TenCN" aria-describedby="TenCN"> -->
+                            <select class="form-select" placeholder="Tên cơ sở vật chất" name="TenCSVC" aria-describedby="TenCSVC">
+                                <option></option>
+                                <?php
+                                while ($row = $cosovatchat->fetch_assoc()) {
+                                ?>
+                                    <option><?= $row['TenCSVC'] ?></option>
+                                <?php
+                                } ?>
+                            </select>
+
                         </div>
                         <div class="input-group mb-3">
-                            <input type="text" id="ngaybatdauInput" class="form-control"
-                                placeholder="Năm">
+                            <input type="text" id="ngaybatdauInput" name="nam" class="form-control" placeholder="Năm">
                         </div>
-                        
-                        <button id="submitBtn" class="btn btn-primary btn-lg btn-block">Xem danh sách</button>
-                    </div>
-                    <table id="dataTable" class="shadow table caption-top rounded overflow-hidden d-none">
+
+                        <button id="submitBtn" name="show" class="btn btn-primary btn-lg btn-block">Xem danh sách</button>
+                    </form>
+                    <table id="dataTable" class="shadow table caption-top rounded overflow-hidden">
                         <thead class="table-light">
                             <tr>
                                 <th scope="col">Tháng</th>
                                 <th scope="col">Tổng doanh thu</th>
                                 <th scope="col">Đã thanh toán</th>
                                 <th scope="col">Còn nợ</th>
-                              
-                              
-                               
                             </tr>
                         </thead>
                         <tbody>
+                        <?php
+                            if ($doanhthu!='') {
+                                while ($row = $doanhthu->fetch_assoc()) {
+                            ?>
+                                    <tr>
+                                        <td><?= $row['thang'] ?></td>
+                                        <td><?= $row['DoanhThu'] ?></td>
+                                        <td><?= $row['DaThanhToan'] ?></td>
+                                        <td><?= $row['ChuaThanhToan'] ?></td>
+                                    </tr>
+                            <?php
+                                }
+                            }
+                            ?>
                         </tbody>
                     </table>
                 </div>
@@ -57,83 +102,7 @@
         </div>
     </div>
 
-    <script>
-    var inputForm = document.getElementById("inputForm");
-    var dataTable = document.getElementById("dataTable");
-    var backBtnContainer = document.getElementById("backBtnContainer");
-
-    document.getElementById("submitBtn").addEventListener("click", function() {
-        var maSinhVien = document.getElementById("maSinhVienInput").value;
-
-        // Dữ liệu JSON mẫu
-        var data = [{
-                "v1": "01",
-                "v2": "20000000",
-                "v3": "4000000",
-                "v4": "0",
-               
-               
-            },
-            {
-                "v1": "02",
-                "v2": "30000000",
-                "v3": "3000000",
-                "v4": "1000000",
-              
-            }
-           
-        ];
-
-        // Xóa dữ liệu bảng cũ (nếu có)
-        var tableBody = document.querySelector("#dataTable tbody");
-        while (tableBody.firstChild) {
-            tableBody.firstChild.remove();
-        }
-
-        // Thêm dữ liệu mới vào bảng
-        data.forEach(function(item) {
-            var row = document.createElement("tr");
-
-            var v1_Cell = document.createElement("td");
-            var v2_Cell = document.createElement("td");
-            var v3_Cell = document.createElement("td");
-            var v4_Cell = document.createElement("td");
-          
-
-            v1_Cell.textContent = item.v1;
-            v2_Cell.textContent = item.v2;
-            v3_Cell.textContent = item.v3;
-            v4_Cell.textContent = item.v4;
-          
-
-            row.appendChild(v1_Cell);
-            row.appendChild(v2_Cell);
-            row.appendChild(v3_Cell);
-            row.appendChild(v4_Cell);
-            
-          
-
-
-            row.addEventListener("click", function() {
-                showDetailModal(item.v1,item.v2,item.v3,item.v4);
-            });
-
-            tableBody.appendChild(row);
-        });
-
-        // Hiển thị bảng và ẩn form nhập
-        inputForm.classList.add("d-none");
-        dataTable.classList.remove("d-none");
-        backBtnContainer.classList.remove("d-none");
-    });
-
-    document.getElementById("backBtn").addEventListener("click", function() {
-        // Hiển thị form nhập và ẩn bảng
-        inputForm.classList.remove("d-none");
-        dataTable.classList.add("d-none");
-        backBtnContainer.classList.add("d-none");
-    });
-    </script>
+    
 </body>
 
 </html>

@@ -1,16 +1,22 @@
 <?php
-$rootPath = '/DormitoryManagement';
-
-// Connect to the database
 require_once '../db_connection.php';
-$sqlShowCN = "SELECT * FROM sinhvien";
-$bla = $conn->query($sqlShowCN);
-$hoadonconno='';
-if (isset($_POST['xem'])){
-    $masosinhvien=$_POST['MSSV'];
-    $query="call hoadonconno('$masosinhvien')";
-    $hoadonconno= $conn->query($query);
+
+$sqlShowCSVC = "SELECT * FROM cosovatchat";
+$cosovatchat = $conn->query($sqlShowCSVC);
+$tensv = '';
+if (isset($_POST['show'])) {
+    $TenCSVC = $_POST['TenCSVC'];
+    $thoidiem = $_POST['thoidiem'];
+
+    $tb = '';
+    $ok = true;
+    if ($ok) {
+        $sqlInsert = "select sinhvien_CSVC('$TenCSVC','$thoidiem') as sinhvien_CSVC ;";
+        $tensv = $conn->query($sqlInsert);
+    }
 }
+
+
 ?>
 
 
@@ -36,61 +42,51 @@ if (isset($_POST['xem'])){
             <div class="col-12">
                 <div class="shadow p-3 my-5 rounded" style="background-color: white">
                     <div class=" d-flex justify-content-between align-items-center">
-                        <h1 class="text-center display-5 m-4" style="width:fit-content;height:fit-content">Danh sách hóa
-                            đơn còn nợ</h1>
+                        <h1 class="text-center display-5 m-4" style="width:fit-content;height:fit-content">Sinh viên nào đang sử dụng cơ sở vật chất</h1>
                         <div id="backBtnContainer" class="text-center mt-3 d-none">
                             <button id="backBtn" class="btn btn-primary p-3">Quay lại</button>
                         </div>
                     </div>
                     <form class="p-3" target="_self" id="inputForm" method="post">
+                        <!-- <div class="input-group mb-3">
+                            <input type="text" id="maSinhVienInput" class="form-control"
+                                placeholder="Tên cơ sở vật chất">
+                        </div> -->
                         <div class="input-group mb-3">
-                            <span class="input-group-text" id="MSSV">Mã số sinh viên</span>
+                            <span class="input-group-text" id="TenCSVC">Tên cơ sở vật chất</span>
                             <!-- <input type="text" class="form-control" placeholder="Tên cụm nhà" name="TenCN" aria-describedby="TenCN"> -->
-                            <select class="form-select" placeholder="Mã số sinh viên" name="MSSV" aria-describedby="MSSV">
+                            <select class="form-select" placeholder="Tên cơ sở vật chất" name="TenCSVC" aria-describedby="TenCSVC">
                                 <option></option>
                                 <?php
-                                while ($row = $bla->fetch_assoc()) {
+                                while ($row = $cosovatchat->fetch_assoc()) {
                                 ?>
-                                    <option><?= $row['MSSV'] ?></option>
+                                    <option><?= $row['TenCSVC'] ?></option>
                                 <?php
                                 } ?>
                             </select>
 
                         </div>
-                        <button id="submitBtn" name="xem" class="btn btn-primary btn-lg btn-block">Xem danh sách</button>
+                        <label for="birthdaytime">Thời điểm:</label>
+                        <input type="datetime-local" id="thoidiem" name="thoidiem">
+
+                        <button id="submitBtn" name="show" class="btn btn-primary btn-lg btn-block">Xem danh sách</button>
                     </form>
                     <table id="dataTable" class="shadow table caption-top rounded overflow-hidden">
                         <thead class="table-light">
                             <tr>
-                                <th scope="col">Mã hóa đơn</th>
-                                <th scope="col">Ngày tạo hóa đơn</th>
-                                <th scope="col">Ngày đăng kí</th>
-                                <th scope="col">Thời gian bắt đầu sử dụng</th>
-                                <th scope="col">Thời giang ngừng sử dụng</th>
-                                <th scope="col">Hạn thanh toán</th>
-                                <th scope="col">Còn nợ</th>
+                                <th scope="col">Họ và tên sinh viên</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php
-                            
-                            if ($hoadonconno != '') {
-                                while ($row2 = $hoadonconno->fetch_assoc()) {
+                        <?php
+                            if ($tensv != '') {
+                                $row1 = $tensv->fetch_assoc();
                             ?>
                                     <tr>
-                                        <td><?= $row2['MaHD'] ?></td>
-                                        <td><?= $row2['NgayTaoHoaDon'] ?></td>
-                                        <td><?= $row2['NgayDangKy'] ?></td>
-                                        <td><?= $row2['ThoiGianBatDauSD'] ?></td>
-                                        <td><?= $row2['ThoiGianNgungSD'] ?></td>
-                                        <td><?= $row2['HanThanhToan'] ?></td>
-                                        <td><?= $row2['ConNo'] ?></td>
+                                        <td><?= $row1['sinhvien_CSVC']?></td>
                                     </tr>
-
                             <?php
-                                }
-                            }
-                            else {
+                            }else {
                                 echo "<tr><td colspan='7' class='text-center'>Không có dữ liệu</td></tr>";
                             }
                             ?>
@@ -101,7 +97,7 @@ if (isset($_POST['xem'])){
         </div>
     </div>
 
-    
+
 </body>
 
 </html>

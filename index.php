@@ -30,10 +30,19 @@ $cosovatchat = $conn->query($sqlShowcosovatchat);
                         <a class="nav-link active" aria-current="page" href="index.php">Quản lí cơ sở vật chất</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="">Link</a>
+                        <a class="nav-link" href="DoanhThuCSVC">Hóa đơn cơ sở vật chất</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
+                        <a class="nav-link" href="HoaDonCSVC">Doanh Thu cơ sở vật chất</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Statistics">Thống kê trung bình</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Bill">Hóa đơn còn nợ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Sinhvien">Họ và tên sinh viên</a>
                     </li>
                 </ul>
             </div>

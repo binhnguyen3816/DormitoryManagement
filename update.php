@@ -56,11 +56,7 @@ if (isset($_POST['update'])) {
         $ok = false;
     }
     if ($ok) {
-        // $sqlInsert = "INSERT INTO cosovatchat (TenCSVC, TinhTrang, GiaThue, GioMoCua, GioDongCua, TenCN, MaNVQL) 
-        //              VALUES ('$TenCSVC', '$TinhTrang', '$GiaThue', '$GioMoCua', '$GioDongCua', '$TenCN', '$MaNVQL')";
-        $sqlUpdate = "UPDATE cosovatchat 
-                    SET TenCSVC = '$TenCSVC', TinhTrang = '$TinhTrang', GiaThue = '$GiaThue', GioMoCua = '$GioMoCua', GioDongCua = '$GioDongCua', TenCN = '$TenCN', MaNVQL = '$MaNVQL' 
-                    WHERE TenCSVC = '$TenCSVC'";
+        $sqlUpdate = "call update_CSVC('$TenCSVC', '$GiaThue', '$GioMoCua', '$GioDongCua', '$TenCN','$TinhTrang', '$MaNVQL');";
         $conn->query($sqlUpdate);
         setcookie('thongBao', 'Đã cập nhật cơ sở vật chất thành công', time() + 5);
         header("location: index.php");

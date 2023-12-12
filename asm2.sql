@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Dec 10, 2023 at 10:24 AM
+-- Generation Time: Dec 12, 2023 at 09:34 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -20,6 +20,140 @@ SET time_zone = "+00:00";
 --
 -- Database: `asm2`
 --
+
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `del_CSVC` (IN `TenCSVC` VARCHAR(255))   BEGIN
+         if exists (select * from hoadoncsvc, phieudangkycsvc where hoadoncsvc.TenCSVC=TenCSVC or phieudangkycsvc.TenCSVC=TenCSVC)
+         then UPDATE cosovatchat SET TinhTrang = 'ngừng hoạt động' WHERE cosovatchat.TenCSVC = TenCSVC;
+         else DELETE FROM cosovatchat WHERE cosovatchat.TenCSVC=TenCSVC;
+         end if;
+       END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `hoadonconno` (`MSSV` VARCHAR(7))   BEGIN
+			drop table if exists temp1;
+			drop table if exists temp2;
+			drop table if exists temp3;
+			drop table if exists temp4;
+            if not exists (select * from sinhvien where sinhvien.MSSV=MSSV)
+				then SIGNAL SQLSTATE "45000"
+	        SET MESSAGE_TEXT = 'Mã số sinh viên không tồn tại !', MYSQL_ERRNO = 1001;
+			end if;
+			create temporary table temp1 (MaHD varchar(10), NgayTaoHoaDon date, NgayDangKy date, ThoiGianBatDauSD timestamp, ThoiGianNgungSD timestamp, HanThanhToan date, ConNo int);
+			insert into temp1 select hoadon.MaHD, hoadon.NgayTaoHoaDon, hoadon.NgayDangKy, hoadon.ThoiGianBatDauSD, hoadon.ThoiGianNgungSD, 
+										hoadon.HanThanhToan, hoadon.ThanhTien as ConNo
+								from phieudangky, sinhvien, taikhoansv, hoadoncsvc, hoadon
+								where sinhvien.MSSV=MSSV AND sinhvien.CCCD=taikhoansv.CCCD AND phieudangky.TenTaiKhoan=taikhoansv.TenTaiKhoan
+									AND hoadoncsvc.MaPDK=phieudangky.MaPDK AND hoadoncsvc.MaHD=hoadon.MaHD AND hoadon.TrangThaiThanhToan='chưa thanh toán';
+			
+			create temporary table temp2 (MaHD varchar(10), NgayTaoHoaDon date, NgayDangKy date, ThoiGianBatDauSD timestamp, ThoiGianNgungSD timestamp, HanThanhToan date, ConNo int);
+ 			insert into temp2 select hoadon.MaHD, hoadon.NgayTaoHoaDon, hoadon.NgayDangKy, hoadon.ThoiGianBatDauSD, hoadon.ThoiGianNgungSD, 
+ 										hoadon.HanThanhToan, hoadon.ThanhTien as ConNo
+ 								from phieudangky, sinhvien, taikhoansv, hoadonluutru, hoadon
+ 								where sinhvien.MSSV=MSSV AND sinhvien.CCCD=taikhoansv.CCCD AND phieudangky.TenTaiKhoan=taikhoansv.TenTaiKhoan
+ 									AND hoadonluutru.MaPDK=phieudangky.MaPDK AND hoadonluutru.MaHD=hoadon.MaHD AND hoadon.TrangThaiThanhToan='chưa thanh toán';	
+ 			create temporary table temp3 (MaHD varchar(10), NgayTaoHoaDon date, NgayDangKy date, ThoiGianBatDauSD timestamp, ThoiGianNgungSD timestamp, HanThanhToan date, ConNo int);
+ 			insert into temp3 select hoadon.MaHD, hoadon.NgayTaoHoaDon, hoadon.NgayDangKy, hoadon.ThoiGianBatDauSD, hoadon.ThoiGianNgungSD, 
+ 										hoadon.HanThanhToan, hoadon.ThanhTien as ConNo
+ 								from phieudangky, sinhvien, taikhoansv, hoadonnoithat, hoadon
+ 								where sinhvien.MSSV=MSSV AND sinhvien.CCCD=taikhoansv.CCCD AND phieudangky.TenTaiKhoan=taikhoansv.TenTaiKhoan
+ 									AND hoadonnoithat.MaPDK=phieudangky.MaPDK AND hoadonnoithat.MaHD=hoadon.MaHD AND hoadon.TrangThaiThanhToan='chưa thanh toán';
+ 			create temporary table temp4 (MaHD varchar(10), NgayTaoHoaDon date, NgayDangKy date, ThoiGianBatDauSD timestamp, ThoiGianNgungSD timestamp, HanThanhToan date, ConNo int);
+ 			insert into temp4 select hoadon.MaHD, hoadon.NgayTaoHoaDon, hoadon.NgayDangKy, hoadon.ThoiGianBatDauSD, hoadon.ThoiGianNgungSD, 
+ 										hoadon.HanThanhToan, hoadon.ThanhTien as ConNo
+ 								from sinhvien, taikhoansv, hoadondiennuoc, hoadon
+ 								where sinhvien.MSSV=MSSV AND sinhvien.CCCD=taikhoansv.CCCD AND hoadondiennuoc.TenTaiKhoan=taikhoansv.TenTaiKhoan
+ 									  AND hoadondiennuoc.MaHD=hoadon.MaHD AND hoadon.TrangThaiThanhToan='chưa thanh toán';
+ 		 	 ((select * from temp1 
+             union
+             select * from temp2)
+             union 
+             select * from temp3)
+             union
+             select * from temp4;
+       END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `hoadon_CSVC` (`TenCSVC` VARCHAR(255), `ngaybatdau` DATE, `ngayketthuc` DATE)   BEGIN
+		select hoadon.MaHD, hoadon.NgayTaoHoaDon, hoadon.ThoiGianBatDauSD, hoadon.ThoiGianNgungSD, 
+               hoadoncsvc.SoGioThue,hoadon.HanThanhToan, hoadon.TrangThaiThanhToan, hoadon.ThanhTien, 
+               cosovatchat.TenCSVC,cosovatchat.TenCN, cosovatchat.GiaThue, phieudangkycsvc.MaPDK, phieudangky.TenTaiKhoan
+        from hoadon, hoadoncsvc, phieudangky, phieudangkycsvc, cosovatchat
+        where hoadon.MaHD=hoadoncsvc.MaHD AND hoadoncsvc.MaPDK=phieudangkycsvc.MaPDK 
+			  AND phieudangky.MaPDK=phieudangkycsvc.MaPDK AND hoadon.ThoiGianBatDauSD > ngaybatdau 
+              AND hoadon.ThoiGianNgungSD < ngayketthuc AND cosovatchat.TenCSVC=TenCSVC AND hoadoncsvc.TenCSVC=TenCSVC 
+              AND phieudangkycsvc.TenCSVC=TenCSVC;
+       END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_CSVC` (`TenCSVC` VARCHAR(255), `GiaThue` INT(11), `GioMoCua` TIME, `GioDongCua` TIME, `TenCN` VARCHAR(20), `TinhTrang` VARCHAR(50), `MaNVQL` VARCHAR(10))   
+BEGIN
+		 SET FOREIGN_KEY_CHECKS=0;
+         INSERT INTO cosovatchat (TenCSVC, TinhTrang, GiaThue, GioMoCua, GioDongCua, TenCN, MaNVQL)
+		 VALUES (TenCSVC,TinhTrang, GiaThue,GioMoCua,GioDongCua,TenCN,MaNVQL);
+         SET FOREIGN_KEY_CHECKS=1;
+       END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `update_CSVC` (`TenCSVC` VARCHAR(255), `GiaThue` INT(11), `GioMoCua` TIME, `GioDongCua` TIME, `TenCN` VARCHAR(20), `TinhTrang` VARCHAR(50), `MaNVQL` VARCHAR(10))   BEGIN
+		if TenCN not in (select cumnha.TenCN from cumnha) then 
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Tên cụm nhà không tồn tại';
+		elseif MaNVQL not in (select truongcumnha.MaNV from truongcumnha) then
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Tên nhân viên quản lí không tồn tại';
+		else UPDATE cosovatchat 
+			 SET cosovatchat.TenCSVC = TenCSVC, cosovatchat.TinhTrang = TinhTrang, cosovatchat.GiaThue = GiaThue, cosovatchat.GioMoCua = GioMoCua, cosovatchat.GioDongCua = GioDongCua, cosovatchat.TenCN = TenCN, cosovatchat.MaNVQL = MaNVQL 
+			 WHERE cosovatchat.TenCSVC = TenCSVC;
+		end if;
+       END$$
+
+--
+-- Functions
+--
+CREATE DEFINER=`root`@`localhost` FUNCTION `sinhvien_CSVC` (`TenCSVC` VARCHAR(20), `thoidiem` TIMESTAMP) RETURNS VARCHAR(255) CHARSET utf8mb4 COLLATE utf8mb4_general_ci  BEGIN
+	declare ten varchar(255);
+    select sinhvien.HoVaTen into ten
+    from phieudangkycsvc, taikhoansv, sinhvien, phieudangky
+    where phieudangkycsvc.TenCSVC=TenCSVC AND phieudangkycsvc.MaPDK=phieudangky.MaPDK AND phieudangky.TenTaiKhoan=taikhoansv.TenTaiKhoan
+		  AND taikhoansv.CCCD=sinhvien.CCCD AND phieudangky.ThoiGianBatDau < thoidiem AND phieudangky.ThoiGianKetThuc>thoidiem;
+	return ten;
+END$$
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `TrungBinhDoanhThu` (`TenCN` VARCHAR(20), `nam` INT) RETURNS DECIMAL(10,2)  BEGIN
+	declare tongDoanhThu decimal(10,2);
+    set tongDoanhThu=0;
+	if not exists (select * from cumnha where cumnha.TenCN=TenCN)
+	then SIGNAL SQLSTATE "45000"
+	       SET MESSAGE_TEXT = 'Cụm nhà không tồn tại !', MYSQL_ERRNO = 1001;
+	end if;
+	
+	select sum(hoadon.ThanhTien) AS TongDoanhThu into tongDoanhThu
+    from hoadoncsvc, hoadon
+    where year(hoadon.ThoiGianBatDauSd)=nam AND hoadon.MaHD=hoadoncsvc.MaHD 
+		  AND hoadoncsvc.TenCSVC in (select TenCSVC
+									 from cosovatchat
+									 where cosovatchat.TenCN=TenCN);
+	return tongDoanhThu/12;
+END$$
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `TrungBinhSoGio` (`TenCN` VARCHAR(20), `nam` INT) RETURNS DECIMAL(10,2)  BEGIN
+	declare tongGioThue decimal(10,2);
+    set tongGioThue=0;
+	if not exists (select * from cumnha where cumnha.TenCN=TenCN)
+	then SIGNAL SQLSTATE "45000"
+	       SET MESSAGE_TEXT = 'Cụm nhà không tồn tại !', MYSQL_ERRNO = 1001;
+	end if;
+	
+	select sum(hoadoncsvc.SoGioThue) AS TongSoGioThue into tongGioThue
+    from hoadoncsvc, hoadon
+    where year(hoadon.ThoiGianBatDauSd)=nam AND hoadon.MaHD=hoadoncsvc.MaHD 
+		  AND hoadoncsvc.TenCSVC in (select TenCSVC
+									 from cosovatchat
+									 where cosovatchat.TenCN=TenCN);
+	return tongGioThue/12;
+END$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -89,7 +223,7 @@ CREATE TABLE `cosovatchat` (
 --
 
 INSERT INTO `cosovatchat` (`TenCSVC`, `GiaThue`, `GioMoCua`, `GioDongCua`, `TenCN`, `TinhTrang`, `MaNVQL`) VALUES
-('Internet', 10000, '06:00:00', '20:00:00', 'AH', 'đang hoạt động', 'TCN0013'),
+('Internet', 10000, '06:00:00', '21:30:00', 'A', 'ngừng hoạt động', 'TCN0011'),
 ('Phòng giặt', 10000, '06:00:00', '20:00:00', 'C', 'đang hoạt động', 'TCN0016'),
 ('Phòng sấy', 5000, '06:00:00', '20:00:00', 'F', 'đang hoạt động', 'TCN0019'),
 ('Phòng tập aerobic', 10000, '06:00:00', '20:00:00', 'E', 'đang hoạt động', 'TCN0018'),
@@ -99,6 +233,76 @@ INSERT INTO `cosovatchat` (`TenCSVC`, `GiaThue`, `GioMoCua`, `GioDongCua`, `TenC
 ('Sân bóng rổ', 7000, '06:00:00', '20:00:00', 'D', 'đang hoạt động', 'TCN0017'),
 ('Sân bóng đá', 5000, '06:00:00', '20:00:00', 'A', 'đang hoạt động', 'TCN0011'),
 ('Sân cầu lông', 5000, '06:00:00', '20:00:00', 'G', 'đang hoạt động', 'TCN0020');
+
+--
+-- Triggers `cosovatchat`
+--
+DELIMITER $$
+CREATE TRIGGER `tr5a_GioMoCua` BEFORE INSERT ON `cosovatchat` FOR EACH ROW BEGIN
+  IF NEW.GioMoCua <= ADDTIME(CURTIME(), '06:00:00') THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'GioMoCua phải sau 6h sáng!';
+  END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `tr5b_GioDongCua` BEFORE INSERT ON `cosovatchat` FOR EACH ROW BEGIN
+  IF NEW.GioDongCua >= ADDTIME(CURTIME(), '22:00:00') THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'GioDongCua phải trước 22h tối!';
+  END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `tr5c_GioDongCua` BEFORE INSERT ON `cosovatchat` FOR EACH ROW BEGIN
+  IF NEW.GioDongCua <= ADDTIME(NEW.GioMoCua, '00:00:00') THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'GioDongCua phải sau GioMoCua!';
+  END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `tr5d_GiaThue1Gio` BEFORE INSERT ON `cosovatchat` FOR EACH ROW BEGIN
+  IF ROUND(NEW.GiaThue) != NEW.GiaThue THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'GiaThue phải là giá trị nguyên!';
+  END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `tr5ef_TenCSVC_TenCN` BEFORE INSERT ON `cosovatchat` FOR EACH ROW BEGIN
+  IF LENGTH(NEW.TenCSVC) > 255 THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'TenCSVC phải nhỏ hơn hoặc bằng 255 ký tự!';
+  END IF;
+
+  IF LENGTH(NEW.TenCN) > 255 THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'TenCN phải nhỏ hơn hoặc bằng 255 ký tự!';
+  END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `tr_them_csvc` AFTER INSERT ON `cosovatchat` FOR EACH ROW BEGIN
+    UPDATE cumnha
+    SET SoLuongCSVC = SoLuongCSVC + 1
+    WHERE TenCN = NEW.TenCN;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `tr_xoa_csvc` AFTER DELETE ON `cosovatchat` FOR EACH ROW BEGIN
+    UPDATE cumnha
+    SET SoLuongCSVC = SoLuongCSVC - 1
+    WHERE TenCN = OLD.TenCN;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -140,8 +344,8 @@ CREATE TABLE `hoadon` (
   `NgayTaoHoaDon` date NOT NULL,
   `LoaiDV` varchar(50) NOT NULL,
   `NgayDangKy` date NOT NULL,
-  `NgayBatDauSD` date NOT NULL,
-  `NgayNgungSD` date NOT NULL,
+  `ThoiGianBatDauSD` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `ThoiGianNgungSD` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `HanThanhToan` date NOT NULL,
   `TrangThaiThanhToan` varchar(50) NOT NULL,
   `ThanhTien` int(11) NOT NULL
@@ -151,57 +355,67 @@ CREATE TABLE `hoadon` (
 -- Dumping data for table `hoadon`
 --
 
-INSERT INTO `hoadon` (`MaHD`, `NgayTaoHoaDon`, `LoaiDV`, `NgayDangKy`, `NgayBatDauSD`, `NgayNgungSD`, `HanThanhToan`, `TrangThaiThanhToan`, `ThanhTien`) VALUES
-('HDCSVC001', '2023-01-01', 'Sân bóng đá', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-10', 'Đã thanh toán', 10000),
-('HDCSVC002', '2023-01-02', 'Phòng tập gym', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-15', 'Chưa thanh toán', 10000),
-('HDCSVC003', '2023-01-03', 'Internet', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-12', 'Đã thanh toán', 10000),
-('HDCSVC004', '2023-01-04', 'Sân bóng chuyền', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-14', 'Chưa thanh toán', 10000),
-('HDCSVC005', '2023-01-05', 'Phòng tập yoga', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-20', 'Đã thanh toán', 10000),
-('HDCSVC006', '2023-01-06', 'Phòng giặt', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-18', 'Chưa thanh toán', 8000),
-('HDCSVC007', '2023-01-07', 'Sân bóng rổ', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-13', 'Đã thanh toán', 8000),
-('HDCSVC008', '2023-01-08', 'Phòng tập aerobic', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-16', 'Chưa thanh toán', 8000),
-('HDCSVC009', '2023-01-09', 'Phòng sấy', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-11', 'Đã thanh toán', 8000),
-('HDCSVC010', '2023-01-10', 'Sân cầu lông', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-17', 'Chưa thanh toán', 8000),
-('HDDN001', '2023-01-01', 'Internet', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-10', 'Đã thanh toán', 10000),
-('HDDN002', '2023-01-02', 'Cable TV', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-15', 'Chưa thanh toán', 10000),
-('HDDN003', '2023-01-03', 'Phone', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-12', 'Đã thanh toán', 10000),
-('HDDN004', '2023-01-04', 'Internet', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-14', 'Chưa thanh toán', 10000),
-('HDDN005', '2023-01-05', 'Laundry', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-20', 'Đã thanh toán', 10000),
-('HDDN006', '2023-01-06', 'Electricity and Water', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-18', 'Chưa thanh toán', 8000),
-('HDDN007', '2023-01-07', 'Internet', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-13', 'Đã thanh toán', 8000),
-('HDDN008', '2023-01-08', 'Facilites', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-16', 'Chưa thanh toán', 8000),
-('HDDN009', '2023-01-09', 'Furniture', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-11', 'Đã thanh toán', 8000),
-('HDDN010', '2023-01-10', 'Internet', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-17', 'Chưa thanh toán', 8000),
-('HDLT001', '2023-01-01', 'Thuê phòng', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-10', 'Đã thanh toán', 10000),
-('HDLT002', '2023-01-02', 'Thuê phòng', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-15', 'Chưa thanh toán', 10000),
-('HDLT003', '2023-01-03', 'Thuê phòng', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-12', 'Đã thanh toán', 10000),
-('HDLT004', '2023-01-04', 'Thuê phòng', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-14', 'Chưa thanh toán', 10000),
-('HDLT005', '2023-01-05', 'Thuê phòng', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-20', 'Đã thanh toán', 10000),
-('HDLT006', '2023-01-06', 'Thuê phòng', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-18', 'Chưa thanh toán', 8000),
-('HDLT007', '2023-01-07', 'Thuê phòng', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-13', 'Đã thanh toán', 8000),
-('HDLT008', '2023-01-08', 'Thuê phòng', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-16', 'Chưa thanh toán', 8000),
-('HDLT009', '2023-01-09', 'Thuê phòng', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-11', 'Đã thanh toán', 8000),
-('HDLT010', '2023-01-10', 'Thuê phòng', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-17', 'Chưa thanh toán', 8000),
-('HDNT001', '2023-01-01', 'Nội thất', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-10', 'Đã thanh toán', 10000),
-('HDNT002', '2023-01-02', 'Nội thất', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-15', 'Chưa thanh toán', 10000),
-('HDNT003', '2023-01-03', 'Nội thất', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-12', 'Đã thanh toán', 10000),
-('HDNT004', '2023-01-04', 'Nội thất', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-14', 'Chưa thanh toán', 10000),
-('HDNT005', '2023-01-05', 'Nội thất', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-20', 'Đã thanh toán', 10000),
-('HDNT006', '2023-01-06', 'Nội thất', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-18', 'Chưa thanh toán', 8000),
-('HDNT007', '2023-01-07', 'Nội thất', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-13', 'Đã thanh toán', 8000),
-('HDNT008', '2023-01-08', 'Nội thất', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-16', 'Chưa thanh toán', 8000),
-('HDNT009', '2023-01-09', 'Nội thất', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-11', 'Đã thanh toán', 8000),
-('HDNT010', '2023-01-10', 'Nội thất', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-17', 'Chưa thanh toán', 8000),
-('HDTMB001', '2023-01-01', 'MBDV', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-10', 'Đã thanh toán', 10000),
-('HDTMB002', '2023-01-02', 'MBDV', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-15', 'Chưa thanh toán', 10000),
-('HDTMB003', '2023-01-03', 'MBDV', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-12', 'Đã thanh toán', 10000),
-('HDTMB004', '2023-01-04', 'MBDV', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-14', 'Chưa thanh toán', 10000),
-('HDTMB005', '2023-01-05', 'MBDV', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-20', 'Đã thanh toán', 10000),
-('HDTMB006', '2023-01-06', 'MBDV', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-18', 'Chưa thanh toán', 8000),
-('HDTMB007', '2023-01-07', 'MBDV', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-13', 'Đã thanh toán', 8000),
-('HDTMB008', '2023-01-08', 'MBDV', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-16', 'Chưa thanh toán', 8000),
-('HDTMB009', '2023-01-09', 'MBDV', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-11', 'Đã thanh toán', 8000),
-('HDTMB010', '2023-01-10', 'MBDV', '0000-00-00', '0000-00-00', '0000-00-00', '2023-01-17', 'Chưa thanh toán', 8000);
+INSERT INTO `hoadon` (`MaHD`, `NgayTaoHoaDon`, `LoaiDV`, `NgayDangKy`, `ThoiGianBatDauSD`, `ThoiGianNgungSD`, `HanThanhToan`, `TrangThaiThanhToan`, `ThanhTien`) VALUES
+('HDCSVC001', '2023-01-01', 'Sân bóng đá', '2023-01-01', '2023-12-11 07:39:30', '2023-12-11 07:39:30', '2023-01-15', 'Đã thanh toán', 10000),
+('HDCSVC002', '2023-01-02', 'Phòng tập gym', '2023-02-01', '2023-12-11 07:39:36', '2023-12-11 07:39:36', '2023-02-15', 'Chưa thanh toán', 10000),
+('HDCSVC003', '2023-01-03', 'Internet', '2023-03-01', '2023-12-11 07:39:42', '2023-12-11 07:39:42', '2023-03-15', 'Đã thanh toán', 10000),
+('HDCSVC004', '2023-01-04', 'Sân bóng chuyền', '2023-04-01', '2023-12-11 07:39:47', '2023-12-11 07:39:47', '2023-04-15', 'Chưa thanh toán', 10000),
+('HDCSVC005', '2023-01-05', 'Phòng tập yoga', '2023-05-01', '2023-12-11 07:39:52', '2023-12-11 07:39:52', '2023-05-15', 'Đã thanh toán', 10000),
+('HDCSVC006', '2023-01-06', 'Phòng giặt', '2023-06-01', '2023-12-11 07:39:56', '2023-12-11 07:39:56', '2023-06-15', 'Chưa thanh toán', 8000),
+('HDCSVC007', '2023-01-07', 'Sân bóng rổ', '2023-07-01', '2023-12-11 07:40:04', '2023-12-11 07:40:04', '2023-07-15', 'Đã thanh toán', 8000),
+('HDCSVC008', '2023-01-08', 'Phòng tập aerobic', '2023-08-01', '2023-12-11 07:40:09', '2023-12-11 07:40:09', '2023-08-15', 'Chưa thanh toán', 8000),
+('HDCSVC009', '2023-01-09', 'Phòng sấy', '2023-09-01', '2023-12-11 07:40:18', '2023-12-11 07:40:18', '2023-09-15', 'Đã thanh toán', 8000),
+('HDCSVC010', '2023-01-10', 'Sân cầu lông', '2023-10-01', '2023-12-11 07:40:24', '2023-12-11 07:40:24', '2023-10-15', 'Chưa thanh toán', 8000),
+('HDCSVC011', '2023-12-01', 'Internet', '2023-12-01', '2023-11-30 23:00:15', '2023-12-11 03:00:15', '2023-12-09', 'chưa thanh toán', 130000),
+('HDCSVC012', '2023-11-01', 'Internet', '2023-12-01', '2023-10-31 23:00:15', '2023-11-11 03:00:15', '2023-12-09', 'chưa thanh toán', 130000),
+('HDCSVC013', '2023-12-01', 'Internet', '2023-10-01', '2023-09-30 23:00:15', '2023-10-11 03:00:15', '2023-10-09', 'đã thanh toán', 130000),
+('HDCSVC014', '2023-11-01', 'Internet', '2023-09-01', '2023-08-31 23:00:15', '2023-09-11 03:00:15', '2023-09-09', 'đã thanh toán', 130000),
+('HDCSVC015', '2023-08-01', 'Internet', '2023-08-01', '2023-07-31 23:00:15', '2023-08-11 03:00:15', '2023-08-09', 'đã thanh toán', 130000),
+('HDCSVC016', '2023-07-01', 'Internet', '2023-07-01', '2023-06-30 23:00:15', '2023-07-11 03:00:15', '2023-07-09', 'chưa thanh toán', 130000),
+('HDCSVC017', '2023-06-01', 'Internet', '2023-06-01', '2023-05-31 23:00:15', '2023-06-11 03:00:15', '2023-06-09', 'đã thanh toán', 130000),
+('HDCSVC018', '2023-05-01', 'Internet', '2023-05-01', '2023-04-30 23:00:15', '2023-05-11 03:00:15', '2023-05-09', 'đã thanh toán', 130000),
+('HDCSVC019', '2023-04-01', 'Internet', '2023-04-01', '2023-03-31 23:00:15', '2023-04-11 03:00:15', '2023-04-09', 'đã thanh toán', 130000),
+('HDCSVC020', '2023-03-01', 'Internet', '2023-03-01', '2023-02-28 23:00:15', '2023-03-11 03:00:15', '2023-03-09', 'đã thanh toán', 130000),
+('HDDN001', '2023-01-01', 'Internet', '2023-11-01', '2023-12-11 07:40:31', '2023-12-11 07:40:31', '2023-11-15', 'Đã thanh toán', 10000),
+('HDDN002', '2023-01-02', 'Cable TV', '2023-12-01', '2023-12-11 07:40:35', '2023-12-11 07:40:35', '2023-12-15', 'Chưa thanh toán', 10000),
+('HDDN003', '2023-01-03', 'Phone', '2021-01-01', '2023-12-11 07:40:49', '2023-12-11 07:40:49', '2021-01-12', 'Đã thanh toán', 10000),
+('HDDN004', '2023-01-04', 'Internet', '2022-02-01', '2023-12-11 07:41:27', '2023-12-11 07:41:27', '2022-02-14', 'Chưa thanh toán', 10000),
+('HDDN005', '2023-01-05', 'Laundry', '2022-02-01', '2023-12-11 07:34:17', '2023-12-11 07:34:17', '2023-01-20', 'Đã thanh toán', 10000),
+('HDDN006', '2023-01-06', 'Electricity and Water', '2022-03-01', '2023-12-11 07:34:25', '2023-12-11 07:34:25', '2023-01-18', 'Chưa thanh toán', 8000),
+('HDDN007', '2023-01-07', 'Internet', '2022-06-01', '2023-12-11 07:34:32', '2023-12-11 07:34:32', '2023-01-13', 'Đã thanh toán', 8000),
+('HDDN008', '2023-01-08', 'Facilites', '2022-05-01', '2023-12-11 07:34:41', '2023-12-11 07:34:41', '2023-01-16', 'Chưa thanh toán', 8000),
+('HDDN009', '2023-01-09', 'Furniture', '2022-06-01', '2023-12-11 07:34:47', '2023-12-11 07:34:47', '2023-01-11', 'Đã thanh toán', 8000),
+('HDDN010', '2023-01-10', 'Internet', '2022-07-01', '2023-12-11 07:34:53', '2023-12-11 07:34:53', '2023-01-17', 'Chưa thanh toán', 8000),
+('HDLT001', '2023-01-01', 'Thuê phòng', '2021-08-01', '2023-12-11 07:35:12', '2023-12-11 07:35:12', '2023-01-10', 'Đã thanh toán', 10000),
+('HDLT002', '2023-01-02', 'Thuê phòng', '2021-09-01', '2023-12-11 07:35:21', '2023-12-11 07:35:21', '2023-01-15', 'Chưa thanh toán', 10000),
+('HDLT003', '2023-01-03', 'Thuê phòng', '2021-12-01', '2023-12-11 07:35:26', '2023-12-11 07:35:26', '2023-01-12', 'Đã thanh toán', 10000),
+('HDLT004', '2023-01-04', 'Thuê phòng', '2021-12-01', '2023-12-11 07:35:32', '2023-12-11 07:35:32', '2023-01-14', 'Chưa thanh toán', 10000),
+('HDLT005', '2023-01-05', 'Thuê phòng', '2022-12-01', '2023-12-11 07:35:41', '2023-12-11 07:35:41', '2023-01-20', 'Đã thanh toán', 10000),
+('HDLT006', '2023-01-06', 'Thuê phòng', '2022-12-01', '2023-12-11 07:35:49', '2023-12-11 07:35:49', '2023-01-18', 'Chưa thanh toán', 8000),
+('HDLT007', '2023-01-07', 'Thuê phòng', '2022-12-01', '2023-12-11 07:36:00', '2023-12-11 07:36:00', '2023-01-13', 'Đã thanh toán', 8000),
+('HDLT008', '2023-01-08', 'Thuê phòng', '2022-12-01', '2023-12-11 07:36:06', '2023-12-11 07:36:06', '2023-01-16', 'Chưa thanh toán', 8000),
+('HDLT009', '2023-01-09', 'Thuê phòng', '2022-12-01', '2023-12-11 07:36:22', '2023-12-11 07:36:22', '2023-01-11', 'Đã thanh toán', 8000),
+('HDLT010', '2023-01-10', 'Thuê phòng', '2022-12-01', '2023-12-11 07:36:13', '2023-12-11 07:36:13', '2023-01-17', 'Chưa thanh toán', 8000),
+('HDNT001', '2023-01-01', 'Nội thất', '2022-12-01', '2023-12-11 07:36:28', '2023-12-11 07:36:28', '2023-01-10', 'Đã thanh toán', 10000),
+('HDNT002', '2023-01-02', 'Nội thất', '2022-12-01', '2023-12-11 07:36:34', '2023-12-11 07:36:34', '2023-01-15', 'Chưa thanh toán', 10000),
+('HDNT003', '2023-01-03', 'Nội thất', '2022-12-01', '2023-12-11 07:36:41', '2023-12-11 07:36:41', '2023-01-12', 'Đã thanh toán', 10000),
+('HDNT004', '2023-01-04', 'Nội thất', '2022-12-01', '2023-12-11 07:36:47', '2023-12-11 07:36:47', '2023-01-14', 'Chưa thanh toán', 10000),
+('HDNT005', '2023-01-05', 'Nội thất', '2022-12-01', '2023-12-11 07:36:55', '2023-12-11 07:36:55', '2023-01-20', 'Đã thanh toán', 10000),
+('HDNT006', '2023-01-06', 'Nội thất', '2022-12-01', '2023-12-11 07:37:07', '2023-12-11 07:37:07', '2023-01-18', 'Chưa thanh toán', 8000),
+('HDNT007', '2023-01-07', 'Nội thất', '2022-12-01', '2023-12-11 07:37:12', '2023-12-11 07:37:12', '2023-01-13', 'Đã thanh toán', 8000),
+('HDNT008', '2023-01-08', 'Nội thất', '2022-12-01', '2023-12-11 07:37:53', '2023-12-11 07:37:53', '2023-01-16', 'Chưa thanh toán', 8000),
+('HDNT009', '2023-01-09', 'Nội thất', '2022-12-01', '2023-12-11 07:38:01', '2023-12-11 07:38:01', '2023-01-11', 'Đã thanh toán', 8000),
+('HDNT010', '2023-01-10', 'Nội thất', '2022-12-01', '2023-12-11 07:38:08', '2023-12-11 07:38:08', '2023-01-17', 'Chưa thanh toán', 8000),
+('HDTMB001', '2023-01-01', 'MBDV', '2022-12-01', '2023-12-11 07:38:15', '2023-12-11 07:38:15', '2023-01-10', 'Đã thanh toán', 10000),
+('HDTMB002', '2023-01-02', 'MBDV', '2022-12-01', '2023-12-11 07:38:23', '2023-12-11 07:38:23', '2023-01-15', 'Chưa thanh toán', 10000),
+('HDTMB003', '2023-01-03', 'MBDV', '2022-12-01', '2023-12-11 07:38:30', '2023-12-11 07:38:30', '2023-01-12', 'Đã thanh toán', 10000),
+('HDTMB004', '2023-01-04', 'MBDV', '2022-12-01', '2023-12-11 07:38:39', '2023-12-11 07:38:39', '2023-01-14', 'Chưa thanh toán', 10000),
+('HDTMB005', '2023-01-05', 'MBDV', '2022-12-01', '2023-12-11 07:38:47', '2023-12-11 07:38:47', '2023-01-20', 'Đã thanh toán', 10000),
+('HDTMB006', '2023-01-06', 'MBDV', '2022-12-01', '2023-12-11 07:38:50', '2023-12-11 07:38:50', '2023-01-18', 'Chưa thanh toán', 8000),
+('HDTMB007', '2023-01-07', 'MBDV', '2022-12-01', '2023-12-11 07:38:53', '2023-12-11 07:38:53', '2023-01-13', 'Đã thanh toán', 8000),
+('HDTMB008', '2023-01-08', 'MBDV', '2022-12-01', '2023-12-11 07:38:56', '2023-12-11 07:38:56', '2023-01-16', 'Chưa thanh toán', 8000),
+('HDTMB009', '2023-01-09', 'MBDV', '2022-12-01', '2023-12-11 07:38:58', '2023-12-11 07:38:58', '2023-01-11', 'Đã thanh toán', 8000),
+('HDTMB010', '2023-01-10', 'MBDV', '2022-12-01', '2023-12-11 07:39:01', '2023-12-11 07:39:01', '2023-01-17', 'Chưa thanh toán', 8000);
 
 -- --------------------------------------------------------
 
@@ -230,7 +444,17 @@ INSERT INTO `hoadoncsvc` (`MaHD`, `TenCSVC`, `SoGioThue`, `MaPDK`) VALUES
 ('HDCSVC007', 'Sân bóng rổ', 1, 'PV007'),
 ('HDCSVC008', 'Phòng tập aerobic', 4, 'PV008'),
 ('HDCSVC009', 'Phòng sấy', 6, 'PV009'),
-('HDCSVC010', 'Sân cầu lông', 3, 'PV010');
+('HDCSVC010', 'Sân cầu lông', 3, 'PV010'),
+('HDCSVC011', 'Internet', 2, 'PV001'),
+('HDCSVC012', 'Internet', 2, 'PV001'),
+('HDCSVC013', 'Internet', 2, 'PV001'),
+('HDCSVC014', 'Internet', 2, 'PV001'),
+('HDCSVC015', 'Internet', 2, 'PV002'),
+('HDCSVC016', 'Internet', 2, 'PV003'),
+('HDCSVC017', 'Internet', 2, 'PV003'),
+('HDCSVC018', 'Internet', 2, 'PV003'),
+('HDCSVC019', 'Internet', 2, 'PV003'),
+('HDCSVC020', 'Internet', 2, 'PV003');
 
 -- --------------------------------------------------------
 
@@ -374,16 +598,16 @@ CREATE TABLE `hopdong` (
 --
 
 INSERT INTO `hopdong` (`MaHopDong`, `MaMB`, `NgayBatDau`, `NgayKetThuc`, `CCCD`) VALUES
-('HD0001', 'MB0001', '0000-00-00', '0000-00-00', '001524689037'),
-('HD0002', 'MB0002', '0000-00-00', '0000-00-00', '001975483216'),
-('HD0003', 'MB0003', '0000-00-00', '0000-00-00', '001864250379'),
-('HD0004', 'MB0004', '0000-00-00', '0000-00-00', '001632984571'),
-('HD0005', 'MB0005', '0000-00-00', '0000-00-00', '001304865279'),
-('HD0006', 'MB0006', '0000-00-00', '0000-00-00', '001209874653'),
-('HD0007', 'MB0007', '0000-00-00', '0000-00-00', '001789062345'),
-('HD0008', 'MB0008', '0000-00-00', '0000-00-00', '001543287690'),
-('HD0009', 'MB0009', '0000-00-00', '0000-00-00', '001204587369'),
-('HD0010', 'MB0010', '0000-00-00', '0000-00-00', '001896324507');
+('HD0001', 'MB0001', '2022-11-01', '2023-11-01', '001524689037'),
+('HD0002', 'MB0002', '2022-11-01', '2023-11-01', '001975483216'),
+('HD0003', 'MB0003', '2022-11-01', '2023-11-01', '001864250379'),
+('HD0004', 'MB0004', '2022-11-01', '2023-11-01', '001632984571'),
+('HD0005', 'MB0005', '2022-11-01', '2023-11-01', '001304865279'),
+('HD0006', 'MB0006', '2022-11-01', '2023-11-01', '001209874653'),
+('HD0007', 'MB0007', '2022-11-01', '2023-11-01', '001789062345'),
+('HD0008', 'MB0008', '2022-11-01', '2023-11-01', '001543287690'),
+('HD0009', 'MB0009', '2022-11-01', '2023-11-01', '001204587369'),
+('HD0010', 'MB0010', '2022-11-01', '2023-11-01', '001896324507');
 
 -- --------------------------------------------------------
 
@@ -463,31 +687,31 @@ CREATE TABLE `nguoithan` (
 --
 
 INSERT INTO `nguoithan` (`SV_CCCD`, `HoVaTen`, `NgaySinh`, `GioiTinh`) VALUES
-('001301025380', 'Văn Tất Thắng', '0000-00-00', 'Nam'),
-('035201001228', 'Lê Thị Lan', '0000-00-00', 'Nữ'),
-('042202001511', 'Cao Thị Hạnh', '0000-00-00', 'Nữ'),
-('042303012902', 'Nguyễn Văn Sơn', '0000-00-00', 'Nam'),
-('075302017041', 'Trần Vũ Quỳnh Như', '0000-00-00', 'Nữ'),
-('079302023716', 'Nguyễn Phương Hồng', '0000-00-00', 'Nữ'),
-('082303003975', 'Võ Thị Hồng Gấm', '0000-00-00', 'Nữ'),
-('082303004279', 'Võ Thị Hồng Nhung ', '0000-00-00', 'Nữ'),
-('087303011214', 'Lê Thị Hoa Nở', '0000-00-00', 'Nữ'),
-('089202013750', 'Phạm Thị Mai Lang', '0000-00-00', 'Nữ'),
-('191920528', 'Tôn Nữ Thúy Anh', '0000-00-00', 'Nữ'),
-('191920634', 'Vũ Văn Minh', '0000-00-00', 'Nam'),
-('191920860', 'Ngô Thị Song Hoàng', '0000-00-00', 'Nữ'),
-('191921740', 'Nguyễn Thị Thanh Bình', '0000-00-00', 'Nữ'),
-('191973789', 'Lê Thị Thùy Chi', '0000-00-00', 'Nữ'),
-('212468924', 'Nguyễn Lê Thu Sương', '0000-00-00', 'Nữ'),
-('215593028', 'Lê Nguyễn Hải', '0000-00-00', 'Nam'),
-('215613202', 'Lê Hùng Tiến', '0000-00-00', 'Nam'),
-('231441838', 'Lê Thị Hiệp', '0000-00-00', 'Nữ'),
-('272909687', 'Lưu Hữu Cử', '0000-00-00', 'Nam'),
-('276041233', 'Phạm Văn Thưởng', '0000-00-00', 'Nam'),
-('301640421', 'Võ Thanh Hải', '0000-00-00', 'Nam'),
-('301776828', 'Trần Thị Kim Tâm', '0000-00-00', 'Nữ'),
-('312507287', 'Trung Nhân', '0000-00-00', 'Nam'),
-('312530418', 'Lê Thị Cẩm Hương', '0000-00-00', 'Nữ'),
+('001301025380', 'Văn Tất Thắng', '1987-12-01', 'Nam'),
+('035201001228', 'Lê Thị Lan', '1987-12-01', 'Nữ'),
+('042202001511', 'Cao Thị Hạnh', '1987-12-01', 'Nữ'),
+('042303012902', 'Nguyễn Văn Sơn', '1987-12-01', 'Nam'),
+('075302017041', 'Trần Vũ Quỳnh Như', '1987-12-01', 'Nữ'),
+('079302023716', 'Nguyễn Phương Hồng', '1987-12-01', 'Nữ'),
+('082303003975', 'Võ Thị Hồng Gấm', '1987-12-01', 'Nữ'),
+('082303004279', 'Võ Thị Hồng Nhung ', '1987-12-01', 'Nữ'),
+('087303011214', 'Lê Thị Hoa Nở', '1987-12-01', 'Nữ'),
+('089202013750', 'Phạm Thị Mai Lang', '1987-12-01', 'Nữ'),
+('191920528', 'Tôn Nữ Thúy Anh', '1987-12-01', 'Nữ'),
+('191920634', 'Vũ Văn Minh', '1987-12-01', 'Nam'),
+('191920860', 'Ngô Thị Song Hoàng', '1987-12-01', 'Nữ'),
+('191921740', 'Nguyễn Thị Thanh Bình', '1987-12-01', 'Nữ'),
+('191973789', 'Lê Thị Thùy Chi', '1987-12-01', 'Nữ'),
+('212468924', 'Nguyễn Lê Thu Sương', '1987-12-01', 'Nữ'),
+('215593028', 'Lê Nguyễn Hải', '1987-12-01', 'Nam'),
+('215613202', 'Lê Hùng Tiến', '1987-12-01', 'Nam'),
+('231441838', 'Lê Thị Hiệp', '1987-12-01', 'Nữ'),
+('272909687', 'Lưu Hữu Cử', '1987-12-01', 'Nam'),
+('276041233', 'Phạm Văn Thưởng', '1987-12-01', 'Nam'),
+('301640421', 'Võ Thanh Hải', '1987-12-01', 'Nam'),
+('301776828', 'Trần Thị Kim Tâm', '1987-12-01', 'Nữ'),
+('312507287', 'Trung Nhân', '1987-12-01', 'Nam'),
+('312530418', 'Lê Thị Cẩm Hương', '1987-12-01', 'Nữ'),
 ('366408893', 'Nguyễn Thị Đào', '0000-00-00', 'Nữ'),
 ('371996187', 'Nguyễn Thị Nguyệt Nga', '0000-00-00', 'Nữ'),
 ('372013285', 'Châu Thị Yến Khanh', '0000-00-00', 'Nữ'),
@@ -541,31 +765,31 @@ CREATE TABLE `nhanvien` (
 --
 
 INSERT INTO `nhanvien` (`MaNV`, `TienLuong`, `CCCD`, `HoVaTen`, `NgaySinh`, `GioiTinh`) VALUES
-('BV0001', 10000000, '001264859307', 'Trương Anh Ngọc', '0000-00-00', 'Nam'),
-('BV0002', 10000000, '001750329816', 'Hoàng Diệu Linh', '0000-00-00', 'Nữ'),
-('BV0003', 8000000, '001942867503', 'Ngô Quang Thắng', '0000-00-00', 'Nam'),
-('BV0004', 12000000, '001638245019', 'Đinh Thanh Trúc', '0000-00-00', 'Nữ'),
-('BV0005', 9000000, '001405798632', 'Lê Thảo Vy', '0000-00-00', 'Nữ'),
-('BV0006', 7000000, '001219387506', 'Lê Mạnh Sơn', '0000-00-00', 'Nam'),
-('BV0007', 9000000, '001789065324', 'Nguyễn Tố Như', '0000-00-00', 'Nữ'),
-('BV0008', 7500000, '001542860397', 'Đặng Trúc Thảo', '0000-00-00', 'Nữ'),
-('BV0009', 10000000, '001208957463', 'Mai Linh Chi', '0000-00-00', 'Nữ'),
-('BV0010', 5000000, '001896341250', 'Nguyễn Hải Nam', '0000-00-00', 'Nam'),
-('KT0041', 14000000, '001549637208', 'Phan Văn Quân', '0000-00-00', 'Nam'),
-('KT0042', 5000000, '001423065798', 'Nguyễn Thị Lệ', '0000-00-00', 'Nữ'),
-('KT0043', 8500000, '001936874205', 'Trần Văn Đức', '0000-00-00', 'Nam'),
-('KT0044', 12000000, '001287540693', 'Nguyễn Thị Loan', '0000-00-00', 'Nữ'),
-('KT0045', 14000000, '001630478952', 'Lê Văn Thắng', '0000-00-00', 'Nam'),
-('KT0046', 5000000, '001752630984', 'Nguyễn Thị Hà', '0000-00-00', 'Nữ'),
-('KT0047', 6500000, '001809624735', 'Nguyễn Văn Đức', '0000-00-00', 'Nam'),
-('KT0048', 12000000, '001245387906', 'Trần Thị Hương', '0000-00-00', 'Nữ'),
-('KT0049', 14000000, '001598247630', 'Ngô Đức Thịnh', '0000-00-00', 'Nam'),
-('KT0050', 5000000, '001367482509', 'Đinh Hồng Nga', '0000-00-00', 'Nữ'),
-('NV0051', 6500000, '001840795623', 'Bùi Văn Anh', '0000-00-00', 'Nữ'),
-('NV0052', 12000000, '001295783406', 'Nguyễn Thị Yến', '0000-00-00', 'Nữ'),
-('NV0053', 14000000, '001467230598', 'Trần Văn Hoàng', '0000-00-00', 'Nam'),
-('NV0054', 5000000, '001981654320', 'Vũ Thị Ngọc Anh', '0000-00-00', 'Nữ'),
-('NV0055', 6500000, '001364508297', 'Phạm Văn Tâm', '0000-00-00', 'Nữ'),
+('BV0001', 10000000, '001264859307', 'Trương Anh Ngọc', '1993-12-01', 'Nam'),
+('BV0002', 10000000, '001750329816', 'Hoàng Diệu Linh', '1993-12-01', 'Nữ'),
+('BV0003', 8000000, '001942867503', 'Ngô Quang Thắng', '1993-12-01', 'Nam'),
+('BV0004', 12000000, '001638245019', 'Đinh Thanh Trúc', '1993-12-01', 'Nữ'),
+('BV0005', 9000000, '001405798632', 'Lê Thảo Vy', '1993-12-01', 'Nữ'),
+('BV0006', 7000000, '001219387506', 'Lê Mạnh Sơn', '1993-12-01', 'Nam'),
+('BV0007', 9000000, '001789065324', 'Nguyễn Tố Như', '1993-12-01', 'Nữ'),
+('BV0008', 7500000, '001542860397', 'Đặng Trúc Thảo', '1993-12-01', 'Nữ'),
+('BV0009', 10000000, '001208957463', 'Mai Linh Chi', '1993-12-01', 'Nữ'),
+('BV0010', 5000000, '001896341250', 'Nguyễn Hải Nam', '1993-12-01', 'Nam'),
+('KT0041', 14000000, '001549637208', 'Phan Văn Quân', '1993-12-01', 'Nam'),
+('KT0042', 5000000, '001423065798', 'Nguyễn Thị Lệ', '1993-12-01', 'Nữ'),
+('KT0043', 8500000, '001936874205', 'Trần Văn Đức', '1993-12-01', 'Nam'),
+('KT0044', 12000000, '001287540693', 'Nguyễn Thị Loan', '1993-12-01', 'Nữ'),
+('KT0045', 14000000, '001630478952', 'Lê Văn Thắng', '1993-12-01', 'Nam'),
+('KT0046', 5000000, '001752630984', 'Nguyễn Thị Hà', '1993-12-01', 'Nữ'),
+('KT0047', 6500000, '001809624735', 'Nguyễn Văn Đức', '1993-12-01', 'Nam'),
+('KT0048', 12000000, '001245387906', 'Trần Thị Hương', '1993-12-01', 'Nữ'),
+('KT0049', 14000000, '001598247630', 'Ngô Đức Thịnh', '1993-12-01', 'Nam'),
+('KT0050', 5000000, '001367482509', 'Đinh Hồng Nga', '1993-12-01', 'Nữ'),
+('NV0051', 6500000, '001840795623', 'Bùi Văn Anh', '1993-12-01', 'Nữ'),
+('NV0052', 12000000, '001295783406', 'Nguyễn Thị Yến', '1993-12-01', 'Nữ'),
+('NV0053', 14000000, '001467230598', 'Trần Văn Hoàng', '1993-12-01', 'Nam'),
+('NV0054', 5000000, '001981654320', 'Vũ Thị Ngọc Anh', '1993-12-01', 'Nữ'),
+('NV0055', 6500000, '001364508297', 'Phạm Văn Tâm', '1993-12-01', 'Nữ'),
 ('NV0056', 12000000, '001752490863', 'Lê Thị Quỳnh Nga', '0000-00-00', 'Nữ'),
 ('NV0057', 14000000, '001689754032', 'Nguyễn Văn Hải', '0000-00-00', 'Nam'),
 ('NV0058', 5000000, '001570893246', 'Đỗ Thị Thùy Linh', '0000-00-00', 'Nữ'),
@@ -602,6 +826,64 @@ INSERT INTO `nhanvien` (`MaNV`, `TienLuong`, `CCCD`, `HoVaTen`, `NgaySinh`, `Gio
 ('TV0039', 6500000, '001265903874', 'Đoàn Hữu Toàn', '0000-00-00', 'Nam'),
 ('TV0040', 12000000, '001780492356', 'Bùi Thị Ngọc Trâm', '0000-00-00', 'Nữ');
 
+--
+-- Triggers `nhanvien`
+--
+DELIMITER $$
+CREATE TRIGGER `tr4d_insert_TienLuong` BEFORE INSERT ON `nhanvien` FOR EACH ROW BEGIN
+    DECLARE max_tienluong_ttn INT;
+    DECLARE min_tienluong_tcn INT;
+
+    IF NEW.MaNV LIKE 'TTN%' THEN
+        -- Tính min(TienLuong) của nhân viên có MaNV bắt đầu bằng 'TCN'
+        SELECT MIN(TienLuong) INTO min_tienluong_tcn FROM nhanvien WHERE MaNV LIKE 'TCN%';
+
+        -- Kiểm tra điều kiện
+        IF NEW.TienLuong >= min_tienluong_tcn THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Không thỏa mãn điều kiện: TienLuong của "TTN" phải nhỏ hơn min(TienLuong của "TCN")';
+        END IF;
+    ELSEIF NEW.MaNV LIKE 'TCN%' THEN
+        -- Tính max(TienLuong) của nhân viên có MaNV bắt đầu bằng 'TTN'
+        SELECT MAX(TienLuong) INTO max_tienluong_ttn FROM nhanvien WHERE MaNV LIKE 'TTN%';
+
+        -- Kiểm tra điều kiện
+        IF NEW.TienLuong <= max_tienluong_ttn THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Không thỏa mãn điều kiện: TienLuong của "TCN" phải lớn hơn max(TienLuong của "TTN")';
+        END IF;
+    END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `tr4d_update_TienLuong` BEFORE UPDATE ON `nhanvien` FOR EACH ROW BEGIN
+    DECLARE max_tienluong_ttn INT;
+    DECLARE min_tienluong_tcn INT;
+
+    IF NEW.MaNV LIKE 'TTN%' AND NEW.MaNV != OLD.MaNV THEN
+        -- Tính min(TienLuong) của nhân viên có MaNV bắt đầu bằng 'TCN'
+        SELECT MIN(TienLuong) INTO min_tienluong_tcn FROM nhanvien WHERE MaNV LIKE 'TCN%';
+
+        -- Kiểm tra điều kiện
+        IF NEW.TienLuong >= min_tienluong_tcn THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Không thỏa mãn điều kiện: TienLuong của "TTN" phải nhỏ hơn min(TienLuong của "TCN")';
+        END IF;
+    ELSEIF NEW.MaNV LIKE 'TCN%' AND NEW.MaNV != OLD.MaNV THEN
+        -- Tính max(TienLuong) của nhân viên có MaNV bắt đầu bằng 'TTN'
+        SELECT MAX(TienLuong) INTO max_tienluong_ttn FROM nhanvien WHERE MaNV LIKE 'TTN%';
+
+        -- Kiểm tra điều kiện
+        IF NEW.TienLuong <= max_tienluong_ttn THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Không thỏa mãn điều kiện: TienLuong của "TCN" phải lớn hơn max(TienLuong của "TTN")';
+        END IF;
+    END IF;
+END
+$$
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -621,36 +903,96 @@ CREATE TABLE `phieudangky` (
 --
 
 INSERT INTO `phieudangky` (`MaPDK`, `NgayDangKy`, `ThoiGianBatDau`, `ThoiGianKetThuc`, `TenTaiKhoan`) VALUES
-('LT001', '0000-00-00', '2023-12-13 15:53:26', '0000-00-00 00:00:00', 'user11'),
-('LT002', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user12'),
-('LT003', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user13'),
-('LT004', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user14'),
-('LT005', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user15'),
-('LT006', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user16'),
-('LT007', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user17'),
-('LT008', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user18'),
-('LT009', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user19'),
-('LT010', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user20'),
-('PS001', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user21'),
-('PS002', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user22'),
-('PS003', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user23'),
-('PS004', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user24'),
-('PS005', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user25'),
-('PS006', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user26'),
-('PS007', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user27'),
-('PS008', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user28'),
-('PS009', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user29'),
-('PS010', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user24'),
-('PV001', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user01'),
-('PV002', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user02'),
-('PV003', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user03'),
-('PV004', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user04'),
-('PV005', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user05'),
-('PV006', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user06'),
-('PV007', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user07'),
-('PV008', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user08'),
-('PV009', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user09'),
-('PV010', '0000-00-00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'user10');
+('LT001', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user11'),
+('LT002', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user12'),
+('LT003', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user13'),
+('LT004', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user14'),
+('LT005', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user15'),
+('LT006', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user16'),
+('LT007', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user17'),
+('LT008', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user18'),
+('LT009', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user19'),
+('LT010', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user20'),
+('PS001', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user21'),
+('PS002', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user22'),
+('PS003', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user23'),
+('PS004', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user24'),
+('PS005', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user25'),
+('PS006', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user26'),
+('PS007', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user27'),
+('PS008', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user28'),
+('PS009', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user29'),
+('PS010', '2023-01-01', '2023-01-01 15:53:26', '2024-01-01 15:53:26', 'user24'),
+('PV001', '2023-01-01', '2023-01-01 15:53:26', '2023-01-01 21:53:26', 'user01'),
+('PV002', '2023-02-01', '2023-02-01 15:53:26', '2023-02-01 21:53:26', 'user02'),
+('PV003', '2023-03-01', '2023-03-01 15:53:26', '2023-03-01 21:53:26', 'user03'),
+('PV004', '2023-04-01', '2023-04-01 15:53:26', '2023-04-01 21:53:26', 'user04'),
+('PV005', '2023-05-01', '2023-05-01 15:53:26', '2023-05-01 21:53:26', 'user05'),
+('PV006', '2023-06-01', '2023-06-01 15:53:26', '2023-06-01 21:53:26', 'user06'),
+('PV007', '2023-07-01', '2023-07-01 15:53:26', '2023-07-01 21:53:26', 'user07'),
+('PV008', '2023-08-01', '2023-08-01 15:53:26', '2023-08-01 21:53:26', 'user08'),
+('PV009', '2023-09-01', '2023-09-01 15:53:26', '2023-09-01 21:53:26', 'user09'),
+('PV010', '2023-10-01', '2023-01-01 15:53:26', '2023-01-01 21:53:26', 'user10');
+
+--
+-- Triggers `phieudangky`
+--
+DELIMITER $$
+CREATE TRIGGER `tr4b_dieukien_dk_csvc` BEFORE INSERT ON `phieudangky` FOR EACH ROW BEGIN
+    DECLARE prefix VARCHAR(2);
+    DECLARE tenCSVC_temp VARCHAR(255);
+    DECLARE count_overlap INT;
+
+    -- Lấy 2 ký tự đầu của MaPDK
+    SET prefix = SUBSTRING(NEW.MaPDK, 1, 2);
+
+    -- Nếu MaPDK có 2 ký tự đầu là "PV"
+    IF prefix = 'PV' THEN
+        -- Truy xuất TenCSVC từ bảng phieudangkycsvc
+        SELECT TenCSVC INTO tenCSVC_temp
+        FROM phieudangkycsvc;
+
+        -- Nếu TenCSVC tồn tại
+        IF tenCSVC_temp IS NOT NULL THEN
+            -- Kiểm tra sự trùng lặp thời gian
+            SELECT COUNT(*) INTO count_overlap
+            FROM phieudangky
+            WHERE MaPDK = (SELECT MaPDK FROM phieudangkycsvc WHERE TenCSVC = tenCSVC_temp)
+              AND NEW.ThoiGianBatDau < ThoiGianKetThuc AND NEW.ThoiGianKetThuc > ThoiGianBatDau;
+
+            -- Kiểm tra và so sánh ThoiGianBatDau và ThoiGianKetThuc
+            IF count_overlap > 0 THEN
+                -- Nếu có sự chồng chéo thời gian, hủy thêm dữ liệu và hiển thị thông báo
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'ThoiGianBatDau hoặc ThoiGianKetThuc không hợp lệ';
+            END IF;
+        ELSE
+            -- Nếu TenCSVC không tồn tại, hủy thêm dữ liệu và hiển thị thông báo
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'TenCSVC không tồn tại trong phieudangkycsvc';
+        END IF;
+    END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `tr4e_dieukien_thoigiancsvc` BEFORE INSERT ON `phieudangky` FOR EACH ROW BEGIN
+    DECLARE prefix CHAR(2);
+
+    -- Lấy 2 ký tự đầu của MaPDK
+    SET prefix = SUBSTRING(NEW.MaPDK, 1, 2);
+
+    -- Kiểm tra nếu là 'PV' thì thực hiện kiểm tra thời gian
+    IF prefix = 'PV' THEN
+        -- Kiểm tra chênh lệch thời gian
+        IF TIMEDIFF(NEW.ThoiGianKetThuc, NEW.ThoiGianBatDau) <= '01:00:00' THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Chênh lệch thời gian phải lớn hơn 1 giờ.';
+        END IF;
+    END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -707,6 +1049,32 @@ INSERT INTO `phieudangkyluutru` (`MaPDK`, `LoaiPhong`, `TenTN`, `SoPhong`) VALUE
 ('LT008', 'Phòng 4 máy lạnh', 'AG3', 1001),
 ('LT009', 'Phòng 6', 'AG3', 1002),
 ('LT010', 'Phòng 8', 'AH2', 104);
+
+--
+-- Triggers `phieudangkyluutru`
+--
+DELIMITER $$
+CREATE TRIGGER `tr_dieukien_dangky_luutru` BEFORE INSERT ON `phieudangkyluutru` FOR EACH ROW BEGIN
+    DECLARE svNam INT;
+
+    -- Lấy thông tin năm của sinh viên từ bảng sinhvien
+    SELECT SinhVienNam INTO svNam
+    FROM sinhvien
+    WHERE CCCD = (SELECT CCCD FROM taikhoansv WHERE TenTaiKhoan = (SELECT TenTaiKhoan FROM phieudangky WHERE MaPDK = NEW.MaPDK));
+
+    -- Kiểm tra điều kiện
+    IF svNam IS NOT NULL AND svNam <= 4 THEN
+        -- Hợp lệ, cho phép đăng ký lưu trú
+        INSERT INTO phieudangky (TenTaiKhoan, MaPDK)
+        VALUES ((SELECT TenTaiKhoan FROM phieudangky WHERE MaPDK = NEW.MaPDK), NEW.MaPDK);
+    ELSE
+        -- Không hợp lệ, không cho phép đăng ký lưu trú
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Sinh viên không đủ điều kiện đăng ký lưu trú.';
+    END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -821,6 +1189,29 @@ INSERT INTO `sinhvien` (`CCCD`, `MSSV`, `HoVaTen`, `NgaySinh`, `GioiTinh`, `Truo
 ('372013285', '1913902', 'Hà Ngọc Phương Lam', '2001-07-16', 'Nữ', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Quản lý Công nghiệp', 3, 'SV4799123387480', '185 Ngô Quyền, Phường Vĩnh Bảo, Thành phố Rạch Giá', 'AG3', 1001, 'Kiên Giang'),
 ('381887215', '2011193', 'Phan Trung Hiếu', '2002-01-02', 'Nam', 'ĐH Bách khoa, ĐHQG TP.HCM', 'Khoa Kỹ thuật Hóa học', 2, 'SV4799621925517', '162 Nguyễn Tất Thành, Khóm 1, Phường 8, Thành phố ', 'AH1', 202, 'Cà Mau');
 
+--
+-- Triggers `sinhvien`
+--
+DELIMITER $$
+CREATE TRIGGER `tr4c_dieukien_succhua` BEFORE INSERT ON `sinhvien` FOR EACH ROW BEGIN
+    DECLARE tongSV INT;
+    DECLARE tongSC INT;
+
+    -- Đếm tổng số lượng sinh viên trong bảng sinhvien
+    SELECT COUNT(*) INTO tongSV FROM sinhvien;
+
+    -- Đếm tổng của cột succhua trong bảng cumnha
+    SELECT SUM(succhua) INTO tongSC FROM cumnha;
+
+    -- Kiểm tra điều kiện
+    IF tongSV >= tongSC THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Không thỏa mãn điều kiện: Tong so luong sinh vien phai nho hon Tong suc chua';
+    END IF;
+END
+$$
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -914,7 +1305,7 @@ CREATE TABLE `sodienthoaisv` (
 --
 
 INSERT INTO `sodienthoaisv` (`CCCD`, `SoDienThoai`) VALUES
-('001301025380', ''),
+('001301025380', '0233664356'),
 ('035201001228', '0387176316'),
 ('042202001511', '0329457146'),
 ('042303012902', '0932313722'),
@@ -935,13 +1326,13 @@ INSERT INTO `sodienthoaisv` (`CCCD`, `SoDienThoai`) VALUES
 ('231441838', '0339733431'),
 ('272909687', '0977461708'),
 ('276041233', '0359580894'),
-('301640421', ''),
-('301776828', ''),
+('301640421', '0845285434'),
+('301776828', '0345792654'),
 ('312507287', '0859050646'),
 ('312530418', '0968000682'),
 ('366408893', '0376483831'),
 ('371996187', '0855003159'),
-('372013285', ''),
+('372013285', '0855003159'),
 ('381887215', '0916211693');
 
 -- --------------------------------------------------------
@@ -1154,6 +1545,28 @@ INSERT INTO `truongcumnha` (`MaNV`, `Email`, `NgayBatDauQuanLy`, `TenCN`) VALUES
 ('TCN0018', 'NguyenHaoNho234@gmail.com', '2019-01-21', 'E'),
 ('TCN0019', 'PhanThuThao567@gmail.com', '2017-05-06', 'F'),
 ('TCN0020', 'LeNamDuong890@gmail.com', '2019-08-24', 'G');
+
+--
+-- Triggers `truongcumnha`
+--
+DELIMITER $$
+CREATE TRIGGER `tr5g_kiemtra_thamchieu` BEFORE INSERT ON `truongcumnha` FOR EACH ROW BEGIN
+  DECLARE TenCN_ref VARCHAR(20);
+  DECLARE MaNV_ref VARCHAR(10);
+
+  -- Lấy tên cụm nhà và mã số NV quản lý từ bảng cumnha
+  SELECT TenCN, MaNV INTO TenCN_ref, MaNV_ref
+  FROM cumnha
+  WHERE TenCN = NEW.TenCN;
+
+  -- Kiểm tra nếu không tìm thấy cụm nhà hoặc NV quản lý không hợp lệ
+  IF TenCN_ref IS NULL OR MaNV_ref IS NULL OR NEW.MaNV != MaNV_ref THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'TenCN hoặc MaNV không hựp lệ!';
+  END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 

@@ -10,8 +10,6 @@ if (isset($_POST['add'])) {
     $MaNVQL = $_POST['MaNVQL'];
     $tb = '';
     $ok = true;
-    // if ($TenCSVC == '' || $TinhTrang == '' || $GiaThue == '' || $GioMoCua == '' || $GioDongCua == '' || $TenCN == '' || $MaNVQL == '') {
-    //     $tb = 'Bạn chưa nhập đủ các trường' . '<br/>';
     if ($TenCSVC == '') {
         $tb .= 'Bạn chưa nhập tên cơ sở vật chất' . '<br/>';
         $ok = false;
@@ -50,8 +48,7 @@ if (isset($_POST['add'])) {
         $ok = false;
     }
     if ($ok) {
-        $sqlInsert = "INSERT INTO cosovatchat (TenCSVC, TinhTrang, GiaThue, GioMoCua, GioDongCua, TenCN, MaNVQL) 
-                     VALUES ('$TenCSVC', '$TinhTrang', '$GiaThue', '$GioMoCua', '$GioDongCua', '$TenCN', '$MaNVQL')";
+        $sqlInsert = "call insert_CSVC('$TenCSVC', '$GiaThue', '$GioMoCua', '$GioDongCua', '$TenCN','$TinhTrang', '$MaNVQL')";
         $conn->query($sqlInsert);
         setcookie('thongBao', 'Đã thêm cơ sở vật chất thành công', time() + 5);
         header("location: index.php");
