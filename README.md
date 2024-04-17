@@ -3,22 +3,22 @@
 <!-- HCMUT LOGO -->
 <div align="center">
   <a href="https://github.com/LekiizRaii/HCMUT-SSPS_L01_Group8">
-    <img src="images/logo_hcmut.png" alt="Logo" width="80" height="80">
+    <img src="Demo_images/logo_hcmut.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">Software Engineering Project</h3>
+  <h3 align="center">Database Project</h3>
 
   <p align="center">
-    Design a smart printing service for students at HCMUT
+    Design a dormitory management database for student in VNU-HCM
     <br />
-    <a href="https://drive.google.com/file/d/1YQNObS6fbrkyE2G39zZLntI5JqAn6NEf/view?usp=sharing"><strong>Explore the docs »</strong></a>
+    <a href="https://drive.google.com/file/d/1fQzmcFxvDxEK1eajP___lz2qYBNqP-Wc/view?usp=sharing"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="#getting-started-🚀">View Demo</a>
     ·
-    <a href="https://github.com/LekiizRaii/HCMUT-SSPS_L01_Group8/issues">Report Bug</a>
+    <a href="https://github.com/binhnguyen3816/DormitoryManagement/issues">Report Bug</a>
     ·
-    <a href="https://github.com/LekiizRaii/HCMUT-SSPS_L01_Group8/issues">Request Feature</a>
+    <a href="https://github.com/binhnguyen3816/DormitoryManagement/issues">Request Feature</a>
   </p>
 </div>
 
@@ -27,9 +27,9 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project 🔎
 
-![Main page](/Demo_image/Non-DefinedUser.png)
+![Main page](/Demo_images/1.png) 
 
-In this semester (HK231), my team has been assigned an Assignment to design a smart printing service for students at HCMUT. You can find the full requirement: <a href="https://drive.google.com/file/d/1ep6OaNz_upYI6lGA58di6OHq7AVutPsG/view?usp=sharing"><strong> Here</strong></a>
+In this semester (HK231), my team has been assigned an Assignment to design a dormitory management database for students at VNU-HCM. You can find the full requirement: <a href="https://drive.google.com/file/d/1xSWaqMsUcUIZqURM1UI6GEfWlwwmbDP_/view?usp=sharing"><strong> Here</strong></a>
 
 
 
@@ -64,17 +64,13 @@ The following are the Programming Languages and Frameworks that my team uses dur
 
 _Quickly look through the website_
 
-![Main page](/Demo_image/SPSO.png)
+![Main page](/Demo_images/1.png)
 
-![Product page](/Demo_image/Students.png)
+![Product page](/Demo_images/2.png)
 
-![Search page](/Demo_image/Configuration&Preview.png)
+![Search page](/Demo_images/3.png)
 
-![News page](/Demo_image/UploadFile.png)
-
-![Contact page](/Demo_image/Reports.png)
-
-![Policy page](/Demo_image/Settings.png)
+![News page](/Demo_images/4.png)
 
 <!-- USAGE EXAMPLES -->
 ## Installation and Usage 📈
@@ -85,14 +81,14 @@ _To run the demo version of this application, you need to follow these steps:_
 2. Clone the Repository and put it in C:\xampp\htdocs:
    ```sh
    cd C:\xampp\htdocs
-   git clone https://github.com/LekiizRaii/HCMUT-SSPS_L01_Group8.git
+   git clone git@github.com:binhnguyen3816/DormitoryManagement.git
    ```
 3. Click 'Start' for Apache and MySQL in the XAMPP interface.
 4. Go to the URL http://localhost/phpmyadmin/ to add a database.
-5. Click 'Import' -> Select the SQL file (smart_printing.sql - C:\xampp\htdocs\HCMUT-SSPS_L01_Group8\db\smart_printing.sql) in the database folder -> Click 'Go'.
+5. Click 'Import' -> Select the SQL file (asm2.sql - C:\xampp\htdocs\DormitoryManagement\asm2.sql) in the database folder -> Click 'Go'.
 6. Visit the URL:
     ```sh
-        http://localhost/HCMUT-SSPS_L01_Group8
+        http://localhost/DormitoryManagement
     ```
 
     <h2>Enjoy it 🥳</h2>
@@ -107,26 +103,24 @@ _To run the demo version of this application, you need to follow these steps:_
 
 * Nguyễn Đức Bình - [@binhnguyen3816](https://github.com/binhnguyen3816) - binhnguyen3816@gmail.com
 * Nguyễn Duy Tùng - [@tndgoat](https://github.com/tndgoat) - tungnd.goat@gmail.com
-* Trần Nguyễn Thái Bình - [@BinhTran-HCMUT](https://github.com/BinhTran-HCMUT) - binh.tran0611csbk@hcmut.edu.vn
-* Mai Hoàng Danh - [@bznhg23](https://github.com/znhg23) - danh.maikhmt23@hcmut.edu.vn
-* Hồ Huy Hoàng - [@huyhoang379](https://github.com/huyhoang379) - hoang.ho260303@hcmut.edu.vn
-* Trương Hoàng Nguyên Vũ - [@LekiizRaii](https://github.com/LekiizRaii) - vu.truongcompsci@hcmut.edu.vn
-
-Project Link: [https://github.com/LekiizRaii/HCMUT-SSPS_L01_Group8](https://github.com/LekiizRaii/HCMUT-SSPS_L01_Group8)
+* Từ Mai Thế Nhân - [@binhnguyen3816](https://github.com/binhnguyen3816) - binhnguyen3816@gmail.com
+* Lê Hoàng Anh Vũ - [@binhnguyen3816](https://github.com/binhnguyen3816) - binhnguyen3816@gmail.com
+* Đinh Vũ Hà - [@binhnguyen3816](https://github.com/binhnguyen3816) - binhnguyen3816@gmail.com
+Project Link: [https://github.com/binhnguyen3816/DormitoryManagement](https://github.com/binhnguyen3816/DormitoryManagement)
 
 <p align="right">[<a href="#readme-top">Back to Top 🔝</a>]</p>
 
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments 🙏🏻
-After completing this Assignment, the team has achieved significant advantages for the constructed website:
+After completing this Assignment, the team has achieved significant advantages for the constructed database:
 - [x] Attractive interface, well-organized layout, creating an enjoyable and user-friendly experience.
 - [x] Well-managed and organized code.
 - [x] Members have significantly reinforced their knowledge of HTML, CSS, PHP, and other relevant technologies.
 - [x] Great time and tasks management
 - [x] Keyword technique during researching for information
 
-Finally, all team members express gratitude to Mr. Le Dinh Thuan for imparting foundational knowledge and providing opportunities for the team to test their abilities with this project.
+Finally, all team members express gratitude to Mrs. Le Quynh Chi for imparting foundational knowledge and providing opportunities for the team to test their abilities with this project.
 
 <p align="right">[<a href="#readme-top">Back to Top 🔝</a>]</p>
 
